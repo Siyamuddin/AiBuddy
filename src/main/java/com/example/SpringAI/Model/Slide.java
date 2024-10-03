@@ -17,11 +17,16 @@ public class Slide {
     @Column(name = "id", nullable = false)
     private Long id;
     private String slideTitle;
+    @Column(columnDefinition = "TEXT")
     private String slideContent;
+    @Column(columnDefinition = "TEXT")
     private String slideSummary;
+    @Column(columnDefinition = "TEXT")
+    private String generatedMCQ;
+    @Column(columnDefinition = "TEXT")
     private String generatedQuestions;
     @ManyToOne
-    @JoinColumn(name = "userclass_id")
+    @JoinColumn(name = "userclass")
     private UserClass userclass;
 
 }

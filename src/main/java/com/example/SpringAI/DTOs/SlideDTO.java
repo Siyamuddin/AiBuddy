@@ -14,6 +14,7 @@ public class SlideDTO {
     private String slideTitle;
     private String slideContent;
     private String slideSummary;
+    private String generatedMCQ;
     private String generatedQuestions;
-    private UserClassDTO userClass;
+//    private UserClassDTO userclass;
 }
