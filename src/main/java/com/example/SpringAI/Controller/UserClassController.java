@@ -2,7 +2,12 @@ package com.example.SpringAI.Controller;
 
 import com.example.SpringAI.DTOs.SlideDTO;
 import com.example.SpringAI.DTOs.UserClassDTO;
+import com.example.SpringAI.Services.AIServices.ConfigLangChain;
 import com.example.SpringAI.Services.UserClassServices;
+import com.example.SpringAI.Utility.APIResponse;
+import com.google.gson.annotations.JsonAdapter;
+import dev.langchain4j.model.chat.request.ChatRequest;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +20,8 @@ import java.util.List;
 public class UserClassController {
     @Autowired
     private UserClassServices userClassServices;
+    @Autowired
+    private ConfigLangChain ollama;
     @PostMapping("/create/{userid}")
     public ResponseEntity<UserClassDTO> createUserClass(@RequestBody UserClassDTO userClassDTO,@PathVariable Long userid)
     {
@@ -52,7 +59,19 @@ public class UserClassController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @DeleteMapping("/delete/{classId}")
+    public ResponseEntity<APIResponse> deleteClass(@PathVariable Long classId){
+        userClassServices.deleteClass(classId);
+        APIResponse apiResponse=new APIResponse("User class "+classId+" is deleted Successfully", true);
+        return new ResponseEntity<>(apiResponse,HttpStatus.OK);
+    }
 
+    @GetMapping("/chat/{message}")
+    public ResponseEntity<String> chat(@PathVariable String message){
+        String response=ollama.chatClient().generate(message);
+//        APIResponse apiResponse=new APIResponse(response,true);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
 
 
 }

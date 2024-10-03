@@ -12,10 +12,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SlideRepo extends JpaRepository<UserClass, Long> {
-//    List<Slide> findAllByUserClassId(Long id);
-@Query(value = "SELECT * FROM slide s WHERE s.userclass_id = :userclassId", nativeQuery = true)
-List<Slide> findSlidesByUserClassId(@Param("userclassId") Long userclassId);
+public interface SlideRepo extends JpaRepository<Slide, Long> {
+ List<Slide> findAllByUserclass(UserClass userClass);
+
 
 
 

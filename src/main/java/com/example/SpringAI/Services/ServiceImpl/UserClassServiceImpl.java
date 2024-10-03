@@ -9,7 +9,9 @@ import com.example.SpringAI.Model.UserClass;
 import com.example.SpringAI.Repository.LocalUserRepo;
 import com.example.SpringAI.Repository.SlideRepo;
 import com.example.SpringAI.Repository.UserClassRepo;
+import com.example.SpringAI.Services.AIServices.ConfigLangChain;
 import com.example.SpringAI.Services.UserClassServices;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserClassServiceImpl implements UserClassServices {
     @Autowired
@@ -32,6 +35,8 @@ public class UserClassServiceImpl implements UserClassServices {
     private SlideRepo slideRepo;
     @Autowired
     private LocalUserRepo localUserRepo;
+    @Autowired
+    private ConfigLangChain model;
 
     @Override
     public UserClassDTO createNewClass(UserClassDTO userClassDTO, Long userId) {
@@ -61,7 +66,6 @@ public class UserClassServiceImpl implements UserClassServices {
     @Override
     public UserClassDTO getClass(Long classId) {
         UserClass userClass=userClassRepo.findById(classId).orElseThrow(()->new ResourceNotFoundException("Class","class ID",classId));
-
         return modelMapper.map(userClass,UserClassDTO.class);
     }
 
@@ -91,15 +95,10 @@ public class UserClassServiceImpl implements UserClassServices {
     @Override
     public List<SlideDTO> getAllSlideByClass(Long classId) {
         UserClass userClass=userClassRepo.findById(classId).orElseThrow(()->new ResourceNotFoundException("Class","class ID",classId));
-        List<Slide> slides=slideRepo.findSlidesByUserClassId(classId);
+        List<Slide> slides=slideRepo.findAllByUserclass(userClass);
         List<SlideDTO> slideDTOS=slides.stream().map((slide)-> modelMapper.map(slide,SlideDTO.class)).collect(Collectors.toUnmodifiableList());
 
         return slideDTOS;
     }
 
-    @Override
-    public List<SlideDTO> uploadSlide(Long classId, SlideDTO slideDTO, MultipartFile file) {
-
-        return List.of();
-    }
 }
