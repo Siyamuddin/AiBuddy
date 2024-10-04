@@ -93,9 +93,18 @@ public class UserClassServiceImpl implements UserClassServices {
     }
 
     @Override
-    public List<SlideDTO> getAllSlideByClass(Long classId) {
+    public List<SlideDTO> getAllSlideByClass(Long classId,int pageNumber,int pageSize,String sortBy,String sortDirection) {
         UserClass userClass=userClassRepo.findById(classId).orElseThrow(()->new ResourceNotFoundException("Class","class ID",classId));
-        List<Slide> slides=slideRepo.findAllByUserclass(userClass);
+        Sort sort;
+        if(sortDirection.equalsIgnoreCase("asc"))
+        {
+            sort=Sort.by(sortBy).ascending();
+        }
+        else {
+            sort=Sort.by(sortBy).descending();
+        }
+        Pageable pageable= PageRequest.of(pageNumber,pageSize,sort);
+        Page<Slide> slides=slideRepo.findAllByUserclass(userClass,pageable);
         List<SlideDTO> slideDTOS=slides.stream().map((slide)-> modelMapper.map(slide,SlideDTO.class)).collect(Collectors.toUnmodifiableList());
 
         return slideDTOS;

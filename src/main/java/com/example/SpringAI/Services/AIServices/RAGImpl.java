@@ -1,5 +1,6 @@
 package com.example.SpringAI.Services.AIServices;
 
+import com.example.SpringAI.Services.ServiceImpl.EmbeddingCacheServiceImpl;
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.data.document.Document;
@@ -43,6 +44,7 @@ public class RAGImpl {
     private ConfigLangChain configLangChain;
 
 
+
     public String generateRAGResponse(String resource, String prompt){
 
         Document document =new Document(resource);
@@ -50,10 +52,9 @@ public class RAGImpl {
 
         // Split document into segments 100 tokens each
         DocumentSplitter splitter = DocumentSplitters.recursive(
-                300,
-                0
+                500,
+                2
         );
-
         List<TextSegment> segments = splitter.split(document);
 
         // Embed segments (convert them into vectors that represent the meaning) using embedding model
@@ -97,10 +98,7 @@ public class RAGImpl {
 
         String response=aiMessage.text();
 
-
-
-
-return response;
+        return response;
     }
 
 }

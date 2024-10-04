@@ -54,8 +54,13 @@ public class UserClassController {
     }
 
     @GetMapping("/get/all/slide/{classId}")
-    public ResponseEntity<List<SlideDTO>> getAllSlideByClass(@PathVariable Long classId){
-        List<SlideDTO> response=userClassServices.getAllSlideByClass(classId);
+    public ResponseEntity<List<SlideDTO>> getAllSlideByClass(@PathVariable Long classId,
+                                                             @RequestParam(value = "pageNumber",defaultValue = "0",required = false) int pageNumber,
+                                                             @RequestParam(value="pageSize",defaultValue = "5",required = false) int pageSize,
+                                                             @RequestParam(value = "sortBy",defaultValue = "id",required = false) String sortBy,
+                                                             @RequestParam(value = "sortDirection",defaultValue = "asc",required = false) String sortDirection
+                                                             ){
+        List<SlideDTO> response=userClassServices.getAllSlideByClass(classId,pageNumber,pageSize,sortBy,sortDirection);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 

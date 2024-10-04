@@ -10,7 +10,12 @@ public interface SlideServices {
     void uploadSlide(Long classId, MultipartFile file) throws IOException;
     SlideDTO updateSlide(Long slideId, SlideDTO slideDTO);
     SlideDTO getSlide(Long slideId);
-    void delete(Long slideId);
+    List getAllSlidesByClass(Long classId,int pageNumber,int pageSize,String sortBy,String sortDirection);
+    String generateShortQuestions(Long slideId,String numberOfQuestions);
+    String generateMCQ(Long slideId,String numberOfMCQs);
+    String generateSummary(Long slideId);
+    String writeAiQuery(Long slideId, String query);
+    void deleteSlide(Long slideId);
 
 
 }

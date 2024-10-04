@@ -12,5 +12,5 @@ public interface UserClassServices {
     UserClassDTO getClass(Long classId);
     List<UserClassDTO> getAllClass(int pageNumber, int pageSize, String sortBy, String sortDirection);
     void deleteClass(Long classId);
-    List<SlideDTO> getAllSlideByClass(Long classId);
+    List<SlideDTO> getAllSlideByClass(Long classId,int pageNumber,int pageSize,String sortBy,String sortDirection);
 }
