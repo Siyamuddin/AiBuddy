@@ -26,6 +26,7 @@ public class ConfigLangChain {
                      .baseUrl(Base_URL)
                      .modelName(MODEL_NAME)
                      .timeout(Duration.ofMinutes(5))
+                     .format("JSON")
                      .topK(10)
                      .topP(.5)
                      .build();
