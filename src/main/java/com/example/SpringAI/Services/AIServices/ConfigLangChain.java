@@ -19,21 +19,22 @@ import java.time.Duration;
 @Configuration
 @Slf4j
 public class ConfigLangChain {
-         @Value("${ai.model.name}")
-         private String MODEL_NAME;
-         @Value("${ai.base.url}")
-         private String Base_URL;
-         @Value("${ai.api.key}")
-         private String API_KEY;
 
-         @Bean
-         public ChatLanguageModel chatClient(){
-             ChatLanguageModel model= OpenAiChatModel.builder()
-                     .baseUrl(Base_URL)
-                     .apiKey(API_KEY)
-                     .modelName(MODEL_NAME)
-                     .build();
-             return  model;
-         }
+    @Value("${ai.model.name}")
+    private String MODEL_NAME;
+    @Value("${ai.base.url}")
+    private String Base_URL;
+    @Value("${ai.api.key}")
+    private String API_KEY;
+
+    @Bean
+    public ChatLanguageModel chatClient(){
+        ChatLanguageModel model= OpenAiChatModel.builder()
+                .baseUrl(Base_URL)
+                .apiKey(API_KEY)
+                .modelName(MODEL_NAME)
+                .build();
+        return  model;
+    }
 
 }
