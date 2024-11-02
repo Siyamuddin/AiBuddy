@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>User Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            text-align: center;
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+        }
+        .preview-container {
+            margin-top: 20px;
+            display: none;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        .preview-container h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .preview-container p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Register User</h2>
+    <form id="registerForm">
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" name="firstName" placeholder="Enter your first name" required>
+
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" name="lastName" placeholder="Enter your last name" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+        <label for="university">University</label>
+        <input type="text" id="university" name="university" placeholder="Enter your university" required>
+
+        <label for="department">Department</label>
+        <input type="text" id="department" name="department" placeholder="Enter your department" required>
+
+        <label for="country">Country</label>
+        <input type="text" id="country" name="country" placeholder="Enter your country" required>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <div class="message" id="message"></div>
+
+    <!-- Preview Section -->
+    <div class="preview-container" id="previewContainer">
+        <h3>Registered User</h3>
+        <p><strong>First Name:</strong> <span id="previewFirstName"></span></p>
+        <p><strong>Last Name:</strong> <span id="previewLastName"></span></p>
+        <p><strong>Email:</strong> <span id="previewEmail"></span></p>
+        <p><strong>Password:</strong> <span id="previewPassword"></span></p>
+        <p><strong>University:</strong> <span id="previewUniversity"></span></p>
+        <p><strong>Department:</strong> <span id="previewDepartment"></span></p>
+        <p><strong>Country:</strong> <span id="previewCountry"></span></p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const university = document.getElementById('university').value;
+        const department = document.getElementById('department').value;
+        const country = document.getElementById('country').value;
+
+        // Preview the input data
+        document.getElementById('previewFirstName').textContent = firstName;
+        document.getElementById('previewLastName').textContent = lastName;
+        document.getElementById('previewEmail').textContent = email;
+        document.getElementById('previewPassword').textContent = password;
+        document.getElementById('previewUniversity').textContent = university;
+        document.getElementById('previewDepartment').textContent = department;
+        document.getElementById('previewCountry').textContent = country;
+
+        // Show the preview section
+        document.getElementById('previewContainer').style.display = 'block';
+
+        const data = {
+            firstName,
+            lastName,
+            email,
+            password,
+            university,
+            department,
+            country
+        };
+
+        try {
+            const response = await fetch('http://localhost:8080/api/v1/user/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (response.status === 201) {
+                document.getElementById('message').textContent = 'User Registered Successfully!';
+                document.getElementById('message').classList.remove('error');
+            } else {
+                document.getElementById('message').textContent = `Error: ${result.message}`;
+                document.getElementById('message').classList.add('error');
+            }
+        } catch (error) {
+            document.getElementById('message').textContent = `Network Error: ${error.message}`;
+            document.getElementById('message').classList.add('error');
+        }
+    });
+</script>
+
+</body>
+</html>

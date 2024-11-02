@@ -45,9 +45,10 @@ public class SlideServiceImpl implements SlideServices {
     private MailSenderServices mailSenderServices;
     @Override
     @Transactional
-    public void uploadSlide(Long classId, MultipartFile file) throws IOException {
+    public Long uploadSlide(Long classId, MultipartFile file) throws IOException {
         //checking if the userClass is available or not
         UserClass userClass=userClassRepo.findById(classId).orElseThrow(()-> new ResourceNotFoundException("Class","class ID:",classId));
+        log.info("Email :"+userClass.getLocalUser().getEmail());
         String text= null;
         try {
             //converts the PDF file in to String Text
@@ -66,10 +67,10 @@ public class SlideServiceImpl implements SlideServices {
         //Setting slides userClass
         slide.setUserclass(userClass);
         //saving the slide.
-        slideRepo.save(slide);
+        Slide resp=slideRepo.save(slide);
         //Mail confirmation that slide is ready for operation.
         mailSenderServices.sendEmail(userClass.getLocalUser().getEmail(),"AiBuddy mail Confirmation.","Your uploaded slide is ready to perform operations.");
-
+        return resp.getId();
     }
 
     @Override
@@ -116,7 +117,7 @@ public class SlideServiceImpl implements SlideServices {
     @Override
     public String generateMCQ(Long slideId, String numberOfMCQs) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
-        String MCQ=rag.generateRAGResponse(slide.getSlideContent(),"Generate "+numberOfMCQs+" possible Multiple choice questions from this lecture");
+        String MCQ=rag.generateRAGResponse2(slide.getSlideContent(),"Generate "+numberOfMCQs+" multiple-choice questions (MCQs) based on the content. Ensure that each question has 4 options, and highlight the correct answer.");
         slide.setGeneratedMCQ(MCQ);
         slideRepo.save(slide);
         mailSenderServices.sendEmail(slide.getUserclass().getLocalUser().getEmail(),"AiBuddy mail Confirmation.",numberOfMCQs+" MCQs are generated from :"+slide.getSlideTitle());
@@ -128,7 +129,7 @@ public class SlideServiceImpl implements SlideServices {
     public String generateSummary(Long slideId) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
         //getting the AI generated summary of our given text.
-        String summary = rag.generateRAGResponse(slide.getSlideContent(),"Generate summary of this lecture");
+        String summary = rag.generateRAGResponse2(slide.getSlideContent(),"Summarize the key points from the content above for effective revision.");
         slide.setSlideSummary(summary);
         slideRepo.save(slide);
         mailSenderServices.sendEmail(slide.getUserclass().getLocalUser().getEmail(),"AiBuddy mail Confirmation.","A short summary is generated from :"+slide.getSlideTitle());
@@ -148,5 +149,21 @@ public class SlideServiceImpl implements SlideServices {
     public void deleteSlide(Long slideId) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
         slideRepo.deleteById(slideId);
+    }
+
+    @Override
+    public List<SlideDTO> getAllSlides(int pageNumber, int pageSize, String sortBy, String sortDirection) {
+        Sort sort;
+        if(sortDirection.equalsIgnoreCase("asc"))
+        {
+            sort=Sort.by(sortBy).ascending();
+        }
+        else {
+            sort=Sort.by(sortBy).descending();
+        }
+        Pageable pageable=PageRequest.of(pageNumber,pageSize,sort);
+        Page<Slide> pages=slideRepo.findAll(pageable);
+        List<SlideDTO> slideDTOS=pages.stream().map(page-> modelMapper.map(page,SlideDTO.class)).collect(Collectors.toUnmodifiableList());
+        return slideDTOS;
     }
 }
