@@ -74,7 +74,7 @@ public class RAGImpl {
 
         // Find relevant embeddings in embedding store by semantic similarity
         // You can play with parameters below to find a sweet spot for your specific use case
-        int maxResults = 3;
+        int maxResults = 5;
         double minScore = 0.7;
         EmbeddingSearchRequest embeddingSearchRequest=EmbeddingSearchRequest.builder()
                 .queryEmbedding(questionEmbedding)
