@@ -1,4 +1,4 @@
-package com.example.SpringAI.Services;
+package com.example.SpringAI.Services.ServiceImpl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

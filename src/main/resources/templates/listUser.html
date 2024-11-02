@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>All Users</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            padding: 20px;
+        }
+        .container {
+            margin: auto;
+            max-width: 900px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #28a745;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .loading {
+            text-align: center;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>All Users</h2>
+
+    <div class="loading" id="loadingMessage">Loading users, please wait...</div>
+
+    <table id="usersTable" style="display: none;">
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>University</th>
+            <th>Department</th>
+            <th>Country</th>
+        </tr>
+        </thead>
+        <tbody id="usersTableBody">
+        <!-- Data will be populated here by JavaScript -->
+        </tbody>
+    </table>
+
+    <p id="errorMessage" style="color: red; text-align: center;"></p>
+</div>
+
+<script>
+    async function fetchUsers() {
+        try {
+            const response = await fetch('/api/v1/user/get/all?pageSize=5&pageNumber=0&sortBy=id&sortDirection=asc');
+            const users = await response.json();
+
+            const tableBody = document.getElementById('usersTableBody');
+            const table = document.getElementById('usersTable');
+            const loadingMessage = document.getElementById('loadingMessage');
+            const errorMessage = document.getElementById('errorMessage');
+
+            if (response.ok) {
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${user.firstName}</td>
+                        <td>${user.lastName}</td>
+                        <td>${user.email}</td>
+                        <td>${user.password}</td>
+                        <td>${user.university}</td>
+                        <td>${user.department}</td>
+                        <td>${user.country}</td>
+                    `;
+
+                    tableBody.appendChild(row);
+                });
+
+                table.style.display = 'table';
+                loadingMessage.style.display = 'none';
+            } else {
+                loadingMessage.style.display = 'none';
+                errorMessage.textContent = 'Failed to fetch users.';
+            }
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            document.getElementById('loadingMessage').textContent = 'Error loading users.';
+        }
+    }
+
+    window.onload = fetchUsers;
+</script>
+
+</body>
+</html>
