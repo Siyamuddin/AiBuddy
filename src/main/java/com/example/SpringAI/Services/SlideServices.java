@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface SlideServices {
-    void uploadSlide(Long classId, MultipartFile file) throws IOException;
+    Long uploadSlide(Long classId, MultipartFile file) throws IOException;
     SlideDTO updateSlide(Long slideId, SlideDTO slideDTO);
     SlideDTO getSlide(Long slideId);
     List getAllSlidesByClass(Long classId,int pageNumber,int pageSize,String sortBy,String sortDirection);
@@ -16,6 +16,7 @@ public interface SlideServices {
     String generateSummary(Long slideId);
     String writeAiQuery(Long slideId, String query);
     void deleteSlide(Long slideId);
+    List<SlideDTO> getAllSlides(int pageNumber, int pageSize, String sortBy, String sortDirection);
 
 
 }

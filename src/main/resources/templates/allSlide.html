@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slides Dashboard</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .slide-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background-color: #ffffff;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        .slide-card:hover {
+            transform: scale(1.02);
+        }
+        .card-title {
+            text-align: center;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .section h5 {
+            color: #6c757d;
+        }
+        .section p {
+            margin-bottom: 5px;
+        }
+        .generate-btn {
+            margin-top: 10px;
+        }
+        .read-more {
+            color: #007bff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .read-more:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center mb-4">Slides Dashboard</h1>
+    <div id="slides-container" class="row"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // Fetch all slides and render them
+    async function fetchAndRenderSlides() {
+        const response = await fetch('http://localhost:8080/api/v1/slide/get/all?pageSize=5&pageNumber=0&sortBy=id&sortDirection=asc');
+        const data = await response.json();
+
+        const slidesContainer = document.getElementById('slides-container');
+        slidesContainer.innerHTML = ''; // Clear existing content
+
+        data.forEach(slide => {
+            // Create slide card
+            const card = document.createElement('div');
+            card.classList.add('col-md-6', 'slide-card');
+
+            // Title
+            const title = document.createElement('h3');
+            title.classList.add('card-title');
+            title.textContent = slide.slideTitle;
+            card.appendChild(title);
+
+            // Generate Short Questions Section
+            card.appendChild(createGenerateSection('Questions', slide.generatedQuestions, () => generateShortQuestions(slide.id)));
+
+            // Generate MCQs Section
+            card.appendChild(createGenerateSection('MCQs', slide.generatedMCQ, () => generateMCQs(slide.id)));
+
+            // Generate Summary Section
+            card.appendChild(createGenerateSection('Summary', slide.slideSummary, () => generateSummary(slide.id)));
+
+            // Slide Content Section
+            card.appendChild(createReadMoreSection('Slide Content', slide.slideContent));
+
+            slidesContainer.appendChild(card);
+        });
+    }
+
+    // Create generate section with "Generate" and ReadMore/ReadLess functionality
+    function createGenerateSection(label, content, generateFunc) {
+        const section = document.createElement('div');
+        section.classList.add('section');
+
+        const labelElem = document.createElement('h5');
+        labelElem.textContent = label;
+        section.appendChild(labelElem);
+
+        // Create formatted Q&A content
+        const contentElem = document.createElement('div');
+        contentElem.innerHTML = formatQAContent(content);
+        section.appendChild(contentElem);
+
+        const generateButton = document.createElement('button');
+        generateButton.classList.add('btn', 'btn-primary', 'btn-sm', 'generate-btn');
+        generateButton.textContent = `Generate ${label}`;
+        generateButton.onclick = async () => {
+            const number = prompt(`Enter number of ${label.toLowerCase()} to generate:`);
+            if (number) await generateFunc(number);
+            await fetchAndRenderSlides(); // Refresh slides after generation
+        };
+        section.appendChild(generateButton);
+
+        return section;
+    }
+
+    // Helper function to format Q&A content
+    function formatQAContent(content) {
+        if (!content) return 'No content available';
+        return content
+            .split(/\*\*Question \d+:\*\*/g) // Split by each question
+            .slice(1) // Remove the empty initial split
+            .map((qa, index) => {
+                const [question, answer] = qa.split(/\*\*Answer:\*\*/); // Separate question and answer
+                return `
+                        <div class="mb-3">
+                            <p><strong>Question ${index + 1}:</strong> ${question.trim()}</p>
+                            <p><strong>Answer:</strong> ${answer.trim()}</p>
+                        </div>
+                    `;
+            })
+            .join('');
+    }
+
+    // Fetch updated data for short questions
+    async function generateShortQuestions(slideID, numQuestions) {
+        await fetch(`http://localhost:8080/api/v1/slide/generate/sq/${slideID}/${numQuestions}`);
+    }
+
+    // Fetch updated data for MCQs
+    async function generateMCQs(slideID, numMCQs) {
+        await fetch(`http://localhost:8080/api/v1/slide/generate/mcq/${slideID}/${numMCQs}`);
+    }
+
+    // Fetch updated data for summary
+    async function generateSummary(slideID) {
+        await fetch(`http://localhost:8080/api/v1/slide/generate/summary/${slideID}`);
+    }
+
+    // Create a section with ReadMore/ReadLess functionality
+    function createReadMoreSection(label, content) {
+        const section = document.createElement('div');
+        section.classList.add('section');
+
+        const labelElem = document.createElement('h5');
+        labelElem.textContent = label;
+        section.appendChild(labelElem);
+
+        const contentElem = document.createElement('p');
+        contentElem.textContent = content ? content.slice(0, 100) : 'No content available';
+        section.appendChild(contentElem);
+
+        if (content && content.length > 100) {
+            const toggleLink = document.createElement('span');
+            toggleLink.textContent = ' Read More';
+            toggleLink.classList.add('read-more');
+
+            toggleLink.onclick = () => {
+                if (toggleLink.textContent === ' Read More') {
+                    contentElem.textContent = content;
+                    toggleLink.textContent = ' Read Less';
+                } else {
+                    contentElem.textContent = content.slice(0, 100);
+                    toggleLink.textContent = ' Read More';
+                }
+            };
+
+            section.appendChild(toggleLink);
+        }
+
+        return section;
+    }
+
+    // Initial fetch and render of slides
+    fetchAndRenderSlides();
+</script>
+</body>
+</html>
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Slides Dashboard</title>-->
+<!--    <style>-->
+<!--        .slide-card {-->
+<!--            border: 1px solid #ccc;-->
+<!--            border-radius: 8px;-->
+<!--            padding: 16px;-->
+<!--            margin: 8px 0;-->
+<!--            max-width: 500px;-->
+<!--        }-->
+<!--        .card-title {-->
+<!--            text-align: center;-->
+<!--            font-weight: bold;-->
+<!--        }-->
+<!--        .section {-->
+<!--            margin: 8px 0;-->
+<!--        }-->
+<!--        .read-more {-->
+<!--            color: blue;-->
+<!--            cursor: pointer;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Slides Dashboard</h1>-->
+<!--<div id="slides-container"></div>-->
+
+<!--<script>-->
+<!--    // Fetch all slides and render them-->
+<!--    async function fetchAndRenderSlides() {-->
+<!--        const response = await fetch('http://localhost:8080/api/v1/slide/get/all?pageSize=5&pageNumber=0&sortBy=id&sortDirection=asc');-->
+<!--        const data = await response.json();-->
+
+<!--        const slidesContainer = document.getElementById('slides-container');-->
+<!--        slidesContainer.innerHTML = ''; // Clear existing content-->
+
+<!--        data.forEach(slide => {-->
+<!--            // Create slide card-->
+<!--            const card = document.createElement('div');-->
+<!--            card.classList.add('slide-card');-->
+
+<!--            // Title-->
+<!--            const title = document.createElement('h3');-->
+<!--            title.classList.add('card-title');-->
+<!--            title.textContent = slide.slideTitle;-->
+<!--            card.appendChild(title);-->
+
+<!--            // Generate Short Questions Section-->
+<!--            card.appendChild(createGenerateSection('Questions', slide.generatedQuestions, () => generateShortQuestions(slide.id)));-->
+
+<!--            // Generate MCQs Section-->
+<!--            card.appendChild(createGenerateSection('MCQs', slide.generatedMCQ, () => generateMCQs(slide.id)));-->
+
+<!--            // Generate Summary Section-->
+<!--            card.appendChild(createGenerateSection('Summary', slide.slideSummary, () => generateSummary(slide.id)));-->
+
+<!--            // Slide Content Section-->
+<!--            card.appendChild(createReadMoreSection('Slide Content', slide.slideContent));-->
+
+<!--            slidesContainer.appendChild(card);-->
+<!--        });-->
+<!--    }-->
+
+<!--    // Create generate section with "Generate" and ReadMore/ReadLess functionality-->
+<!--    function createGenerateSection(label, content, generateFunc) {-->
+<!--        const section = document.createElement('div');-->
+<!--        section.classList.add('section');-->
+
+<!--        const contentContainer = createReadMoreSection(label, content);-->
+<!--        section.appendChild(contentContainer);-->
+
+<!--        const generateButton = document.createElement('button');-->
+<!--        generateButton.textContent = `Generate ${label}`;-->
+<!--        generateButton.onclick = async () => {-->
+<!--            const number = prompt(`Enter number of ${label.toLowerCase()} to generate:`);-->
+<!--            if (number) await generateFunc(number);-->
+<!--            await fetchAndRenderSlides(); // Refresh slides after generation-->
+<!--        };-->
+<!--        section.appendChild(generateButton);-->
+
+<!--        return section;-->
+<!--    }-->
+
+<!--    // Fetch updated data for short questions-->
+<!--    async function generateShortQuestions(slideID, numQuestions) {-->
+<!--        await fetch(`http://localhost:8080/api/v1/slide/generate/sq/${slideID}/${numQuestions}`);-->
+<!--    }-->
+
+<!--    // Fetch updated data for MCQs-->
+<!--    async function generateMCQs(slideID, numMCQs) {-->
+<!--        await fetch(`http://localhost:8080/api/v1/slide/generate/mcq/${slideID}/${numMCQs}`);-->
+<!--    }-->
+
+<!--    // Fetch updated data for summary-->
+<!--    async function generateSummary(slideID) {-->
+<!--        await fetch(`http://localhost:8080/api/v1/slide/generate/summary/${slideID}`);-->
+<!--    }-->
+
+<!--    // Create a section with ReadMore/ReadLess functionality-->
+<!--    function createReadMoreSection(label, content) {-->
+<!--        const section = document.createElement('div');-->
+<!--        section.classList.add('section');-->
+
+<!--        const labelElem = document.createElement('h4');-->
+<!--        labelElem.textContent = label;-->
+<!--        section.appendChild(labelElem);-->
+
+<!--        const contentElem = document.createElement('p');-->
+<!--        contentElem.textContent = content ? content.slice(0, 100) : 'No content available';-->
+<!--        section.appendChild(contentElem);-->
+
+<!--        if (content && content.length > 100) {-->
+<!--            const toggleLink = document.createElement('span');-->
+<!--            toggleLink.textContent = ' Read More';-->
+<!--            toggleLink.classList.add('read-more');-->
+
+<!--            toggleLink.onclick = () => {-->
+<!--                if (toggleLink.textContent === ' Read More') {-->
+<!--                    contentElem.textContent = content;-->
+<!--                    toggleLink.textContent = ' Read Less';-->
+<!--                } else {-->
+<!--                    contentElem.textContent = content.slice(0, 100);-->
+<!--                    toggleLink.textContent = ' Read More';-->
+<!--                }-->
+<!--            };-->
+
+<!--            section.appendChild(toggleLink);-->
+<!--        }-->
+
+<!--        return section;-->
+<!--    }-->
+
+<!--    // Initial fetch and render of slides-->
+<!--    fetchAndRenderSlides();-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->
+
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Slide Dashboard</title>-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">-->
+<!--    <style>-->
+<!--        body {-->
+<!--            background-color: #f8f9fa;-->
+<!--        }-->
+<!--        .container {-->
+<!--            margin-top: 50px;-->
+<!--        }-->
+<!--        .card-title {-->
+<!--            text-align: center;-->
+<!--        }-->
+<!--        .content-preview, .questions-preview, .mcqs-preview {-->
+<!--            overflow: hidden;-->
+<!--            max-height: 3em;-->
+<!--            transition: max-height 0.3s ease;-->
+<!--            white-space: pre-wrap;-->
+<!--        }-->
+<!--        .content-expanded {-->
+<!--            max-height: none;-->
+<!--        }-->
+<!--        .read-more-btn, .generate-btn {-->
+<!--            color: #0d6efd;-->
+<!--            cursor: pointer;-->
+<!--            text-decoration: underline;-->
+<!--            font-weight: bold;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="container">-->
+<!--    <h2 class="text-center">Slides Overview</h2>-->
+<!--    <div id="slidesContainer" class="row"></div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    async function fetchSlides() {-->
+<!--        try {-->
+<!--            const response = await fetch("http://localhost:8080/api/v1/slide/get/all?pageSize=5&pageNumber=0&sortBy=id&sortDirection=asc");-->
+<!--            if (!response.ok) throw new Error("Failed to fetch slides");-->
+
+<!--            const slides = await response.json();-->
+<!--            displaySlides(slides);-->
+<!--        } catch (error) {-->
+<!--            alert(`Error: ${error.message}`);-->
+<!--        }-->
+<!--    }-->
+
+<!--    function displaySlides(slides) {-->
+<!--        const slidesContainer = document.getElementById("slidesContainer");-->
+<!--        slidesContainer.innerHTML = "";-->
+
+<!--        slides.forEach(slide => {-->
+
+<!--            const slideCard = document.createElement("div");-->
+<!--            slideCard.className = "col-md-6 col-lg-4 mb-4";-->
+<!--            slideCard.innerHTML = `-->
+<!--                <div class="card p-3">-->
+<!--                    <h5 class="card-title">${slide.slideTitle || 'Untitled Slide'}</h5>-->
+<!--                    <div class="mb-2">-->
+<!--                        <strong>Generate Questions:</strong>-->
+<!--                        <input type="number" id="questionCount${slide.id}" placeholder="Number of questions" class="form-control mb-2">-->
+<!--                        <button class="btn btn-primary generate-btn" onclick="generateShortQuestions(${slide.id})">Generate</button>-->
+<!--                        <div id="questions${slide.id}" class="questions-preview mt-2 text-muted">No questions generated</div>-->
+<!--                        <span id="readMoreQuestionsBtn${slide.id}" class="read-more-btn d-none" onclick="toggleReadMore(${slide.id}, 'questions')">Read More</span>-->
+<!--                    </div>-->
+<!--                    <div class="mb-2">-->
+<!--                        <strong>Generate MCQs:</strong>-->
+<!--                        <input type="number" id="mcqCount${slide.id}" placeholder="Number of MCQs" class="form-control mb-2">-->
+<!--                        <button class="btn btn-primary generate-btn" onclick="generateMCQs(${slide.id})">Generate</button>-->
+<!--                        <div id="mcqs${slide.id}" class="mcqs-preview mt-2 text-muted">No MCQs generated yet.</div>-->
+<!--                        <span id="readMoreMcqsBtn${slide.id}" class="read-more-btn d-none" onclick="toggleReadMore(${slide.id}, 'mcqs')">Read More</span>-->
+<!--                    </div>-->
+<!--                    <div class="mb-2">-->
+<!--                        <strong>Generate Summary:</strong>-->
+<!--                        <button class="btn btn-primary generate-btn" onclick="generateSummary(${slide.id})">Generate</button>-->
+<!--                        <div id="summary${slide.id}" class="content-preview mt-2 text-muted">No summary generated yet.</div>-->
+<!--                        <span id="readMoreSummaryBtn${slide.id}" class="read-more-btn d-none" onclick="toggleReadMore(${slide.id}, 'summary')">Read More</span>-->
+<!--                    </div>-->
+<!--                    <div class="mb-2">-->
+<!--                        <strong>Slide Content:</strong>-->
+<!--                        <div id="content${slide.id}" class="content-preview mt-2">${slide.slideContent || "No content available"}</div>-->
+<!--                        <span id="readMoreContentBtn${slide.id}" class="read-more-btn" onclick="toggleReadMore(${slide.id}, 'content')">Read More</span>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            `;-->
+<!--            slidesContainer.appendChild(slideCard);-->
+<!--        });-->
+<!--    }-->
+
+<!--    function toggleReadMore(slideId, section) {-->
+<!--        const contentElement = document.getElementById(`${section}${slideId}`);-->
+<!--        const buttonElement = document.getElementById(`readMore${section.charAt(0).toUpperCase() + section.slice(1)}Btn${slideId}`);-->
+<!--        const isExpanded = contentElement.classList.toggle("content-expanded");-->
+<!--        buttonElement.textContent = isExpanded ? "Read Less" : "Read More";-->
+<!--    }-->
+
+<!--    async function generateShortQuestions(slideId) {-->
+<!--        const questionCount = document.getElementById(`questionCount${slideId}`).value || 5;-->
+
+<!--        try {-->
+<!--            const response = await fetch(`http://localhost:8080/api/v1/slide/generate/sq/${slideId}/${questionCount}`);-->
+<!--            if (!response.ok) throw new Error("Failed to generate questions");-->
+
+
+
+<!--             const questions = await response.text();-->
+
+<!--            document.getElementById(`questions${slideId}`).textContent = formatContent(questions);-->
+<!--            toggleVisibility(`readMoreQuestionsBtn${slideId}`, questions);-->
+<!--        } catch (error) {-->
+<!--            alert(`Error: ${error.message}`);-->
+<!--        }-->
+<!--    }-->
+
+<!--    async function generateMCQs(slideId) {-->
+<!--        const mcqCount = document.getElementById(`mcqCount${slideId}`).value || 5;-->
+
+<!--        try {-->
+<!--            const response = await fetch(`http://localhost:8080/api/v1/slide/generate/mcq/${slideId}/${mcqCount}`);-->
+<!--            if (!response.ok) throw new Error("Failed to generate MCQs");-->
+
+<!--            const mcqs = await response.text();-->
+<!--            document.getElementById(`mcqs${slideId}`).textContent = formatContent(mcqs);-->
+<!--            toggleVisibility(`readMoreMcqsBtn${slideId}`, mcqs);-->
+<!--        } catch (error) {-->
+<!--            alert(`Error: ${error.message}`);-->
+<!--        }-->
+<!--    }-->
+
+<!--    async function generateSummary(slideId) {-->
+<!--        try {-->
+<!--            const response = await fetch(`http://localhost:8080/api/v1/slide/generate/summary/${slideId}`);-->
+<!--            if (!response.ok) throw new Error("Failed to generate summary");-->
+
+<!--            const summary = await response.text();-->
+<!--            const summaryElement = document.getElementById(`summary${slideId}`);-->
+<!--            summaryElement.textContent = summary;-->
+<!--            toggleVisibility(`readMoreSummaryBtn${slideId}`, summary);-->
+<!--        } catch (error) {-->
+<!--            alert(`Error: ${error.message}`);-->
+<!--        }-->
+<!--    }-->
+
+<!--    function formatContent(content) {-->
+<!--        return content.split("\n").map((line, index) => `${line}`).join("\n");-->
+<!--    }-->
+
+<!--    function toggleVisibility(buttonId, content) {-->
+<!--        document.getElementById(buttonId).classList.toggle("d-none", content.length <= 100);-->
+<!--    }-->
+
+<!--    fetchSlides();-->
+<!--</script>-->
+
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>-->
+<!--</body>-->
+<!--</html>-->

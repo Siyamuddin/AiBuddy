@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Slide Upload</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .preview-container {
+            margin-top: 20px;
+        }
+        .content-preview {
+            overflow: hidden;
+            max-height: 3em; /* Adjust to show approx. 2 lines */
+            transition: max-height 0.3s ease;
+        }
+        .content-expanded {
+            max-height: none;
+        }
+        .read-more-btn {
+            color: #0d6efd;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center">Upload PDF Slide</h2>
+    <form id="uploadForm" class="card p-4">
+        <div class="mb-3">
+            <label for="classID" class="form-label">Class ID</label>
+            <input type="number" class="form-control" id="classID" name="classID" required>
+        </div>
+        <div class="mb-3">
+            <label for="pdfFile" class="form-label">Choose PDF Slide</label>
+            <input type="file" class="form-control" id="pdfFile" name="pdfFile" accept=".pdf" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Upload Slide</button>
+    </form>
+
+    <div id="previewContainer" class="preview-container d-none card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Slide Preview</h5>
+            <p class="card-text"><strong>Slide Title:</strong> <span id="slideTitle">N/A</span></p>
+            <p class="card-text"><strong>Slide Summary:</strong> <span id="slideSummary">N/A</span></p>
+            <p class="card-text"><strong>Generated MCQs:</strong> <span id="generatedMCQ">N/A</span></p>
+            <p class="card-text"><strong>Generated Questions:</strong> <span id="generatedQuestions">N/A</span></p>
+            <div id="slideContentContainer" class="mt-3">
+                <h6>Slide Content:</h6>
+                <div id="slideContent" class="content-preview card-text border p-3 rounded" style="white-space: pre-wrap;">N/A</div>
+                <span id="readMoreBtn" class="read-more-btn d-none">Read More</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const classID = document.getElementById('classID').value;
+        const pdfFile = document.getElementById('pdfFile').files[0];
+        const formData = new FormData();
+
+        formData.append('file', pdfFile);
+
+        try {
+            const uploadResponse = await fetch(`http://localhost:8080/api/v1/slide/upload/${classID}`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!uploadResponse.ok) throw new Error('Upload failed');
+
+            const slideID = await uploadResponse.json();
+            displayPreview(slideID);
+
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        }
+    });
+
+    async function displayPreview(slideID) {
+        try {
+            const previewResponse = await fetch(`http://localhost:8080/api/v1/slide/get/${slideID}`);
+            if (!previewResponse.ok) throw new Error('Could not fetch slide preview');
+
+            const slideData = await previewResponse.json();
+
+            document.getElementById('slideTitle').textContent = slideData.slideTitle || 'N/A';
+            document.getElementById('slideSummary').textContent = slideData.slideSummary || 'N/A';
+            document.getElementById('generatedMCQ').textContent = slideData.generatedMCQ || 'N/A';
+            document.getElementById('generatedQuestions').textContent = slideData.generatedQuestions || 'N/A';
+
+            if (slideData.slideContent) {
+                const slideContentElem = document.getElementById('slideContent');
+                slideContentElem.textContent = slideData.slideContent;
+                document.getElementById('slideContentContainer').classList.remove('d-none');
+
+                if (slideData.slideContent.length > 200) { // Show "Read More" if content is long
+                    document.getElementById('readMoreBtn').classList.remove('d-none');
+                }
+            } else {
+                document.getElementById('slideContentContainer').classList.add('d-none');
+            }
+
+            document.getElementById('previewContainer').classList.remove('d-none');
+
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        }
+    }
+
+    document.getElementById('readMoreBtn').addEventListener('click', function() {
+        const slideContentElem = document.getElementById('slideContent');
+        const isExpanded = slideContentElem.classList.toggle('content-expanded');
+        this.textContent = isExpanded ? 'Read Less' : 'Read More';
+    });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
