@@ -10,7 +10,7 @@ import java.util.Date;
 
 @Service
 public class MailSenderServices {
-    @Autowired
+
     private JavaMailSender javaMailSender;
 
     public void sendEmail(String to,String subject,String body)
