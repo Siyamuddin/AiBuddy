@@ -21,13 +21,17 @@ public class UserClassController {
     @Autowired
     private UserClassServices userClassServices;
     @Autowired
-    private ConfigLangChain ollama;
+    ConfigLangChain client;
     @PostMapping("/create/{userid}")
     public ResponseEntity<UserClassDTO> createUserClass(@RequestBody UserClassDTO userClassDTO,@PathVariable Long userid)
     {
         UserClassDTO response=userClassServices.createNewClass(userClassDTO,userid);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+
+
+
 
     @PutMapping("/update/{classId}")
     public ResponseEntity<UserClassDTO> updateUserClass(@RequestBody UserClassDTO userClassDTO,@PathVariable Long classId)
@@ -73,7 +77,7 @@ public class UserClassController {
 
     @GetMapping("/chat/{message}")
     public ResponseEntity<String> chat(@PathVariable String message){
-        String response=ollama.chatClient().generate(message);
+        String response=client.chatClient().generate(message);
 //        APIResponse apiResponse=new APIResponse(response,true);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }

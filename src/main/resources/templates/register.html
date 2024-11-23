@@ -90,8 +90,8 @@
         <label for="email">Email</label>
         <input type="email" id="email" name="email" placeholder="Enter your email" required>
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Enter your password" required>
+<!--        <label for="password">Password</label>-->
+<!--        <input type="password" id="password" name="password" placeholder="Enter your password" required>-->
 
         <label for="university">University</label>
         <input type="text" id="university" name="university" placeholder="Enter your university" required>
@@ -113,7 +113,7 @@
         <p><strong>First Name:</strong> <span id="previewFirstName"></span></p>
         <p><strong>Last Name:</strong> <span id="previewLastName"></span></p>
         <p><strong>Email:</strong> <span id="previewEmail"></span></p>
-        <p><strong>Password:</strong> <span id="previewPassword"></span></p>
+<!--        <p><strong>Password:</strong> <span id="previewPassword"></span></p>-->
         <p><strong>University:</strong> <span id="previewUniversity"></span></p>
         <p><strong>Department:</strong> <span id="previewDepartment"></span></p>
         <p><strong>Country:</strong> <span id="previewCountry"></span></p>
@@ -127,7 +127,7 @@
         const firstName = document.getElementById('firstName').value;
         const lastName = document.getElementById('lastName').value;
         const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+        // const password = document.getElementById('password').value;
         const university = document.getElementById('university').value;
         const department = document.getElementById('department').value;
         const country = document.getElementById('country').value;
@@ -136,7 +136,7 @@
         document.getElementById('previewFirstName').textContent = firstName;
         document.getElementById('previewLastName').textContent = lastName;
         document.getElementById('previewEmail').textContent = email;
-        document.getElementById('previewPassword').textContent = password;
+        // document.getElementById('previewPassword').textContent = password;
         document.getElementById('previewUniversity').textContent = university;
         document.getElementById('previewDepartment').textContent = department;
         document.getElementById('previewCountry').textContent = country;
@@ -148,15 +148,15 @@
             firstName,
             lastName,
             email,
-            password,
+            // password,
             university,
             department,
             country
         };
 
         try {
-            const response = await fetch('http://localhost:8080/api/v1/user/register', {
-                method: 'POST',
+            const response = await fetch('http://localhost:8080/api/v1/user/update/1', {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },

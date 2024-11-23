@@ -34,12 +34,6 @@ public class SlideController {
         return new ResponseEntity<>(resp, HttpStatus.OK);
     }
 
-    @GetMapping("/get/{slideId}")
-    public ResponseEntity<SlideDTO> getSlide(@PathVariable Long slideId) {
-        SlideDTO slideDTO = slideServices.getSlide(slideId);
-        return new ResponseEntity<>(slideDTO, HttpStatus.OK);
-    }
-
     @GetMapping("/get/all/slide/{classId}")
     public ResponseEntity<List<SlideDTO>> getAllSlideByClass(@PathVariable Long classId,
                                                              @RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
@@ -49,6 +43,33 @@ public class SlideController {
     ) {
         List<SlideDTO> response = slideServices.getAllSlidesByClass(classId, pageNumber, pageSize, sortBy, sortDirection);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @GetMapping("/get/all")
+    public ResponseEntity<List<SlideDTO>> getAllSlide(@RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
+                                                      @RequestParam(value = "pageSize", defaultValue = "5", required = false) int pageSize,
+                                                      @RequestParam(value = "sortBy", defaultValue = "id", required = false) String sortBy,
+                                                      @RequestParam(value = "sortDirection", defaultValue = "asc", required = false) String sortDirection)
+    {
+        List<SlideDTO> response=slideServices.getAllSlides(pageNumber,pageSize,sortBy,sortDirection);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+
+
+
+
+
+
+
+
+
+                                                 //Project
+
+
+    @GetMapping("/get/{slideId}")
+    public ResponseEntity<SlideDTO> getSlide(@PathVariable Long slideId) {
+        SlideDTO slideDTO = slideServices.getSlide(slideId);
+        return new ResponseEntity<>(slideDTO, HttpStatus.OK);
     }
 
     @GetMapping("/generate/sq/{slideId}/{nsq}")
@@ -91,13 +112,17 @@ public class SlideController {
         return new ResponseEntity<>(apiResponse,HttpStatus.OK);
     }
 
-    @GetMapping("/get/all")
-    public ResponseEntity<List<SlideDTO>> getAllSlide(@RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
-                                                      @RequestParam(value = "pageSize", defaultValue = "5", required = false) int pageSize,
-                                                      @RequestParam(value = "sortBy", defaultValue = "id", required = false) String sortBy,
-                                                      @RequestParam(value = "sortDirection", defaultValue = "asc", required = false) String sortDirection)
-    {
-        List<SlideDTO> response=slideServices.getAllSlides(pageNumber,pageSize,sortBy,sortDirection);
-        return new ResponseEntity<>(response,HttpStatus.OK);
+
+    @PostMapping(value = "/upload/user/{userId}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<SlideDTO> uploadSlideByUser(@PathVariable Long userId,
+                                                      @RequestParam(value = "file",required = true) MultipartFile file){
+        SlideDTO slideDTO=slideServices.userSlideUpload(userId,file);
+        return new ResponseEntity<>(slideDTO,HttpStatus.OK);
+    }
+
+    @GetMapping("/get/all/user/{userId}")
+    public ResponseEntity<List<SlideDTO>> getAllSlideByUser(@PathVariable Long userId){
+        List<SlideDTO> slideDTOS=slideServices.getAllUserSlide(userId);
+        return new ResponseEntity<>(slideDTOS,HttpStatus.OK);
     }
 }

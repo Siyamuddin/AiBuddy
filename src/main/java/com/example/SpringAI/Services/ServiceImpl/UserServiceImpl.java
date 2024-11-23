@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserServices {
 
     @Override
     public UserDTO registerUser(UserDTO userDTO){
-        log.info("user registration method has been called: "+getClass());
+
         List<LocalUser> userList=localUserRepo.findByEmailContainingIgnoreCase(userDTO.getEmail());
         if(userList.isEmpty()){
             LocalUser localUser=modelMapper.map(userDTO, LocalUser.class);
@@ -42,6 +42,46 @@ public class UserServiceImpl implements UserServices {
         }
 
     }
+    @Override
+    public List<UserDTO> getAllUser(int pageNumber, int pageSize, String sortBy, String direction) {
+        Sort sort;
+        if(direction.equalsIgnoreCase("asc"))
+        {
+            sort=Sort.by(sortBy).ascending();
+        }
+        else{
+            sort=Sort.by(sortBy).descending();
+        }
+        Pageable pageable= PageRequest.of(pageNumber,pageSize,sort);
+        Page<LocalUser> localUsers=localUserRepo.findAll(pageable);
+        List<UserDTO> userDTOS=localUsers.stream().map((localUser -> modelMapper.map(localUser,UserDTO.class))).collect(Collectors.toUnmodifiableList());
+
+        return userDTOS;
+    }
+    @Override
+    public List<UserDTO> searchByUserName(String userName, int pageNumber, int pageSize, String sortBy, String direction) {
+        Sort sort;
+        if(direction.equalsIgnoreCase("asc"))
+        {
+            sort=Sort.by(sortBy).ascending();
+        }
+        else {
+            sort=Sort.by(sortBy).descending();
+        }
+        Pageable pageable=PageRequest.of(pageNumber,pageSize,sort);
+        Page<LocalUser> localUsers=localUserRepo.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(userName,userName,pageable);
+        List<UserDTO> userDTOS=localUsers.stream().map((user)-> modelMapper.map(user,UserDTO.class)).collect(Collectors.toUnmodifiableList());
+
+        return userDTOS;
+    }
+
+
+
+
+
+
+                                                     //Project
+
 
     @Override
     public UserDTO updateUser(Long userId, UserDTO userDTO) {
@@ -49,9 +89,9 @@ public class UserServiceImpl implements UserServices {
         localUser.setFirstName(userDTO.getFirstName());
         localUser.setLastName(userDTO.getLastName());
         localUser.setEmail(userDTO.getEmail());
-        localUser.setPassword(userDTO.getPassword());
+//        localUser.setPassword(userDTO.getPassword());
         localUser.setUniversity(userDTO.getUniversity());
-        localUser.setDepartment(localUser.getDepartment());
+        localUser.setDepartment(userDTO.getDepartment());
         localUser.setCountry(userDTO.getCountry());
         LocalUser savedLocalUser=localUserRepo.save(localUser);
         return modelMapper.map(savedLocalUser,UserDTO.class);
@@ -76,39 +116,9 @@ public class UserServiceImpl implements UserServices {
 return true;
     }
 
-    @Override
-    public List<UserDTO> getAllUser(int pageNumber, int pageSize, String sortBy, String direction) {
-        Sort sort;
-        if(direction.equalsIgnoreCase("asc"))
-        {
-            sort=Sort.by(sortBy).ascending();
-        }
-        else{
-            sort=Sort.by(sortBy).descending();
-        }
-        Pageable pageable= PageRequest.of(pageNumber,pageSize,sort);
-        Page<LocalUser> localUsers=localUserRepo.findAll(pageable);
-        List<UserDTO> userDTOS=localUsers.stream().map((localUser -> modelMapper.map(localUser,UserDTO.class))).collect(Collectors.toUnmodifiableList());
 
-        return userDTOS;
-    }
 
-    @Override
-    public List<UserDTO> searchByUserName(String userName, int pageNumber, int pageSize, String sortBy, String direction) {
-        Sort sort;
-        if(direction.equalsIgnoreCase("asc"))
-        {
-            sort=Sort.by(sortBy).ascending();
-        }
-        else {
-            sort=Sort.by(sortBy).descending();
-        }
-        Pageable pageable=PageRequest.of(pageNumber,pageSize,sort);
-        Page<LocalUser> localUsers=localUserRepo.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(userName,userName,pageable);
-        List<UserDTO> userDTOS=localUsers.stream().map((user)-> modelMapper.map(user,UserDTO.class)).collect(Collectors.toUnmodifiableList());
 
-        return userDTOS;
-    }
 
 
 }

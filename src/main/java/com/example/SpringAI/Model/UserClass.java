@@ -22,6 +22,7 @@ public class UserClass {
     @OneToMany(mappedBy = "userclass",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
     private List<Slide> slideList=new ArrayList<>();
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_user_id")
     private LocalUser localUser;

@@ -23,6 +23,34 @@ public class UserController {
         UserDTO userDTOResponse=userServices.registerUser(userDTO);
         return new ResponseEntity<>(userDTOResponse, HttpStatus.CREATED);
     }
+    @GetMapping("/get/all")
+    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam(value = "pageSize",defaultValue = "5",required = false) int pageSize,
+                                                     @RequestParam(value = "sortBy",defaultValue = "id",required = false) String sortBy,
+                                                     @RequestParam(value = "pageNumber",defaultValue = "0",required = false) int pageNumber,
+                                                     @RequestParam(value = "sortDirection", defaultValue = "asc",required = false) String sortDirection){
+        List<UserDTO> userDTOS=userServices.getAllUser(pageNumber,pageSize,sortBy,sortDirection);
+        return new ResponseEntity<>(userDTOS,HttpStatus.OK);
+    }
+    @GetMapping("/search/{username}")
+    public ResponseEntity<List<UserDTO>> searchUser(@PathVariable String username,
+                                                    @RequestParam(value = "pageNumber",defaultValue = "0",required = false) int pageNumber,
+                                                    @RequestParam(value = "pageSize",defaultValue = "5",required = false) int pageSize,
+                                                    @RequestParam(value = "sortBy",defaultValue = "id",required = false) String sortBy,
+                                                    @RequestParam(value = "sortDirection",defaultValue = "asc",required = false) String sortDirection
+    )
+    {
+
+        List<UserDTO> userDTOS=userServices.searchByUserName(username,pageNumber,pageSize,sortBy,sortDirection);
+        return new ResponseEntity<>(userDTOS,HttpStatus.OK);
+    }
+
+
+
+
+
+
+                                                //Project
+
     @PutMapping("/update/{userId}")
     public ResponseEntity<UserDTO> update(@RequestBody UserDTO userDTO,@PathVariable Long userId){
         UserDTO userDTOResponse=userServices.updateUser(userId,userDTO);
@@ -47,26 +75,5 @@ public class UserController {
             return new ResponseEntity<>(apiResponse,HttpStatus.BAD_REQUEST);
 
         }
-    }
-    @GetMapping("/get/all")
-    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam(value = "pageSize",defaultValue = "5",required = false) int pageSize,
-                                                     @RequestParam(value = "sortBy",defaultValue = "id",required = false) String sortBy,
-                                                     @RequestParam(value = "pageNumber",defaultValue = "0",required = false) int pageNumber,
-                                                     @RequestParam(value = "sortDirection", defaultValue = "asc",required = false) String sortDirection){
-        List<UserDTO> userDTOS=userServices.getAllUser(pageNumber,pageSize,sortBy,sortDirection);
-        return new ResponseEntity<>(userDTOS,HttpStatus.OK);
-    }
-
-    @GetMapping("/search/{username}")
-    public ResponseEntity<List<UserDTO>> searchUser(@PathVariable String username,
-                                                    @RequestParam(value = "pageNumber",defaultValue = "0",required = false) int pageNumber,
-                                                    @RequestParam(value = "pageSize",defaultValue = "5",required = false) int pageSize,
-                                                    @RequestParam(value = "sortBy",defaultValue = "id",required = false) String sortBy,
-                                                    @RequestParam(value = "sortDirection",defaultValue = "asc",required = false) String sortDirection
-                                                    )
-    {
-
-        List<UserDTO> userDTOS=userServices.searchByUserName(username,pageNumber,pageSize,sortBy,sortDirection);
-        return new ResponseEntity<>(userDTOS,HttpStatus.OK);
     }
 }

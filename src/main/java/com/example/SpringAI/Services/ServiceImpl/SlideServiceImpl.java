@@ -2,13 +2,14 @@ package com.example.SpringAI.Services.ServiceImpl;
 
 import com.example.SpringAI.DTOs.SlideDTO;
 import com.example.SpringAI.Exceptions.ResourceNotFoundException;
+import com.example.SpringAI.Model.LocalUser;
 import com.example.SpringAI.Model.Slide;
 import com.example.SpringAI.Model.UserClass;
+import com.example.SpringAI.Repository.LocalUserRepo;
 import com.example.SpringAI.Repository.SlideRepo;
 import com.example.SpringAI.Repository.UserClassRepo;
 import com.example.SpringAI.Services.AIServices.RAGImpl;
 import com.example.SpringAI.Services.SlideServices;
-import dev.langchain4j.data.document.Document;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -19,12 +20,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +34,8 @@ import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.load
 public class SlideServiceImpl implements SlideServices {
     @Autowired
     private UserClassRepo userClassRepo;
+    @Autowired
+    private LocalUserRepo localUserRepo;
     @Autowired
     private SlideRepo slideRepo;
     @Autowired
@@ -72,19 +73,6 @@ public class SlideServiceImpl implements SlideServices {
         mailSenderServices.sendEmail(userClass.getLocalUser().getEmail(),"AiBuddy mail Confirmation.","Your uploaded slide is ready to perform operations.");
         return resp.getId();
     }
-
-    @Override
-    public SlideDTO updateSlide(Long slideId, SlideDTO slideDTO) {
-        return null;
-    }
-
-    @Override
-    public SlideDTO getSlide(Long slideId) {
-        Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
-
-        return modelMapper.map(slide,SlideDTO.class);
-    }
-
     @Override
     public List getAllSlidesByClass(Long classId, int pageNumber, int pageSize, String sortBy, String sortDirection) {
         UserClass userClass=userClassRepo.findById(classId).orElseThrow(()->new ResourceNotFoundException("Class","class ID",classId));
@@ -102,6 +90,91 @@ public class SlideServiceImpl implements SlideServices {
         List<SlideDTO> slideDTOS=slides.stream().map((slide)-> modelMapper.map(slide,SlideDTO.class)).collect(Collectors.toUnmodifiableList());
         return slideDTOS;
     }
+    @Override
+    public List<SlideDTO> getAllSlides(int pageNumber, int pageSize, String sortBy, String sortDirection) {
+        Sort sort;
+        if(sortDirection.equalsIgnoreCase("asc"))
+        {
+            sort=Sort.by(sortBy).ascending();
+        }
+        else {
+            sort=Sort.by(sortBy).descending();
+        }
+        Pageable pageable=PageRequest.of(pageNumber,pageSize,sort);
+        Page<Slide> pages=slideRepo.findAll(pageable);
+        List<SlideDTO> slideDTOS=pages.stream().map(page-> modelMapper.map(page,SlideDTO.class)).collect(Collectors.toUnmodifiableList());
+        return slideDTOS;
+    }
+
+
+
+
+
+
+
+
+
+
+
+                                                    //Project
+
+
+    @Override
+    public SlideDTO userSlideUpload(Long userId, MultipartFile file) {
+        //checking if the userClass is available or not
+        LocalUser localUser;
+        localUser=localUserRepo.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","ID",userId));
+        String text= null;
+        try {
+            //converts the PDF file in to String Text
+            PDDocument document=PDDocument.load(file.getInputStream());
+            PDFTextStripper pdfStripper = new PDFTextStripper();
+            text = pdfStripper.getText(document);
+        } catch (IOException e) {
+            log.error("Error: "+e);
+        }
+        //Creating a slide object.
+        Slide slide=new Slide();
+
+        //Setting up the slide fields.
+        slide.setSlideContent(text);
+        slide.setSlideTitle(file.getOriginalFilename());
+        //Setting slides userClass
+        slide.setLocalUser(localUser);
+        //saving the slide.
+        Slide resp=slideRepo.save(slide);
+        //Mail confirmation that slide is ready for operation.
+        mailSenderServices.sendEmail(localUser.getEmail(),"AiBuddy mail Confirmation.","Your uploaded slide is ready to perform operations.");
+        return modelMapper.map(resp,SlideDTO.class);
+    }
+
+
+    @Override
+    public List<SlideDTO> getAllUserSlide(Long userId) {
+        LocalUser localUser=localUserRepo.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","ID",userId));
+        List<Slide> slides=slideRepo.findAllByLocalUserId(userId);
+        List<SlideDTO> slideDTOS=slides.stream().map((slide)-> modelMapper.map(slide,SlideDTO.class)).collect(Collectors.toUnmodifiableList());
+        return slideDTOS;
+    }
+
+    @Override
+    public SlideDTO updateSlide(Long slideId, SlideDTO slideDTO) {
+        return null;
+    }
+
+    @Override
+    public SlideDTO getSlide(Long slideId) {
+        Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
+
+        return modelMapper.map(slide,SlideDTO.class);
+    }
+    @Override
+    public void deleteSlide(Long slideId) {
+        Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
+        slideRepo.deleteById(slideId);
+    }
+
+
 
     @Override
     public String generateShortQuestions(Long slideId, String numberOfQuestions) {
@@ -129,7 +202,7 @@ public class SlideServiceImpl implements SlideServices {
     public String generateSummary(Long slideId) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
         //getting the AI generated summary of our given text.
-        String summary = rag.generateRAGResponse2(slide.getSlideContent(),"Summarize the key points from the content above for effective revision.");
+        String summary = rag.generateRAGResponse(slide.getSlideContent(),"Summarize the key points from the content above for effective revision.");
         slide.setSlideSummary(summary);
         slideRepo.save(slide);
         mailSenderServices.sendEmail(slide.getUserclass().getLocalUser().getEmail(),"AiBuddy mail Confirmation.","A short summary is generated from :"+slide.getSlideTitle());
@@ -145,25 +218,5 @@ public class SlideServiceImpl implements SlideServices {
         return AiResponse;
     }
 
-    @Override
-    public void deleteSlide(Long slideId) {
-        Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
-        slideRepo.deleteById(slideId);
-    }
 
-    @Override
-    public List<SlideDTO> getAllSlides(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        Sort sort;
-        if(sortDirection.equalsIgnoreCase("asc"))
-        {
-            sort=Sort.by(sortBy).ascending();
-        }
-        else {
-            sort=Sort.by(sortBy).descending();
-        }
-        Pageable pageable=PageRequest.of(pageNumber,pageSize,sort);
-        Page<Slide> pages=slideRepo.findAll(pageable);
-        List<SlideDTO> slideDTOS=pages.stream().map(page-> modelMapper.map(page,SlideDTO.class)).collect(Collectors.toUnmodifiableList());
-        return slideDTOS;
-    }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,21 +24,28 @@ public class LocalUser {
     private String firstName;
     @Column(nullable = false)
     private String lastName;
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String email;
-    @Column(nullable = false, updatable = true)
+    @Column(updatable = true)
     private String password;
     @Column(updatable = true)
     private String university;
     private String department;
     private String country;
 
+    private String provider;
+    private String providerId;
+    private String image;
+
     @CreationTimestamp
     private Date creationTime;
-    @LastModifiedBy
+    @LastModifiedDate
     private Date lastUpdatedTime;
 
     @OneToMany(mappedBy = "localUser",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
     private List<UserClass> userClasses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "localUser",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
+    private List<Slide> userSlides = new ArrayList<>();
 
 }

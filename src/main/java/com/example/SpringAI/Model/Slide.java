@@ -29,4 +29,8 @@ public class Slide {
     @JoinColumn(name = "userclass")
     private UserClass userclass;
 
+    @ManyToOne
+    @JoinColumn(name = "localUser")
+    private LocalUser localUser;
+
 }

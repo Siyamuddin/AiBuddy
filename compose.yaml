@@ -8,14 +8,14 @@ services:
       - 'MYSQL_USER=myuser'
     ports:
       - '3306:3306'
-  ollama:
-    image: 'ollama/ollama:latest'
-    ports:
-      - '11434:11434'
-  redis:
-    image: 'redis:latest'
-    ports:
-      - '6379:6379'
+#  ollama:
+#    image: 'ollama/ollama:latest'
+#    ports:
+#      - '11434:11434'
+#  redis:
+#    image: 'redis:latest'
+#    ports:
+#      - '6379:6379'
 
 
 

@@ -1,6 +1,7 @@
 package com.example.SpringAI.Services.AIServices;
 
 import com.example.SpringAI.Services.ServiceImpl.EmbeddingCacheServiceImpl;
+
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
 import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.data.document.Document;
@@ -49,11 +50,11 @@ public class RAGImpl {
 
 
 
+
+
+
     public String generateRAGResponse(String resource, String prompt){
-
         Document document =new Document(resource);
-
-
         // Split document into segments 100 tokens each
         DocumentSplitter splitter = DocumentSplitters.recursive(
                 500,
@@ -66,22 +67,36 @@ public class RAGImpl {
         List<Embedding> embeddings = embeddingModel.embedAll(segments).content();
 
         // Store embeddings into embedding store for further search / retrieval
+//        MongoDbEmbeddingStore embeddingStore = MongoDbEmbeddingStore.builder()
+//                .fromClient(client)
+//                .databaseName("ai_buddy")
+//                .collectionName("ai_collection")
+//                .indexName("default")
+//                .build();
+//        String connectionString = "mongodb+srv://siyamuddin:<17@siyam@17>@aibuddy.b89pw.mongodb.net/?retryWrites=true&w=majority&appName=AiBuddy";
+//        client = MongoClients.create(connectionString);
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
         embeddingStore.addAll(embeddings, segments);
-
         // Embed the question
-        Embedding questionEmbedding = embeddingModel.embed(prompt).content();
-
+        String information = null;
+        List<String> questions=configLangChain.simplifyQuestions(prompt);
+        for(int i=0;i<questions.size();i++){
+        Embedding questionEmbedding = embeddingModel.embed(questions.get(i)).content();
         // Find relevant embeddings in embedding store by semantic similarity
         // You can play with parameters below to find a sweet spot for your specific use case
-        int maxResults = 5;
-        double minScore = 0.7;
+        int maxResults = 2;
+        double minScore = 0.3;
         EmbeddingSearchRequest embeddingSearchRequest=EmbeddingSearchRequest.builder()
                 .queryEmbedding(questionEmbedding)
                 .maxResults(maxResults)
                 .minScore(minScore)
                 .build();
         EmbeddingSearchResult<TextSegment> relevantEmbeddings = embeddingStore.search(embeddingSearchRequest);
+
+        information += relevantEmbeddings.matches().stream()
+                .map(match -> match.embedded().text())
+                .collect(joining("\n\n"));
+        }
 
 
         // Create a prompt for the model that includes question and relevant embeddings
@@ -93,17 +108,18 @@ public class RAGImpl {
                         + "\n"
                         + "Base your answer on the following information:\n"
                         + "{{information}}");
-        String information = relevantEmbeddings.matches().stream()
-                .map(match -> match.embedded().text())
-                .collect(joining("\n\n"));
+
+
+
+        log.info("INFORMATION:"+information);
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("question", prompt);
         variables.put("information", information);
-
         Prompt Modelprompt = promptTemplate.apply(variables);
 
         AiMessage aiMessage=configLangChain.chatClient().generate(Modelprompt.toUserMessage()).content();
+
 
         String response=aiMessage.text();
 

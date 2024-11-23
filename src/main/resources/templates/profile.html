@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f9;
+      color: #333;
+    }
+
+    .profile-container {
+      max-width: 600px;
+      margin: 50px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .profile-header {
+      background: #4CAF50;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .profile-header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .profile-actions {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .profile-actions button {
+      background: #fff;
+      border: none;
+      padding: 5px 10px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-actions button:hover {
+      background: #ddd;
+    }
+
+    .profile-details {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .profile-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #4CAF50;
+    }
+
+    .detail-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .detail-value,
+    .detail-input {
+      color: #333;
+      text-align: right;
+      width: 70%;
+    }
+
+    .detail-input {
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 5px;
+      font-size: 14px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Upload Slide Button */
+    .upload-slide-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .upload-slide-button {
+      background: #4CAF50;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      text-transform: uppercase;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s ease;
+    }
+
+    .upload-slide-button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+<div class="profile-container">
+  <div class="profile-header">
+    <h1><span th:text="${user.getFirstName()} + ' ' + ${user.getLastName()}"></span></h1>
+    <div class="profile-actions">
+
+      <button id="editButton">Edit</button>
+      <input type="hidden" id="userId" th:value="${user.getId()}">
+      <button id="updateButton" class="hidden">Update</button>
+
+    </div>
+  </div>
+
+  <div class="profile-details">
+    <img class="profile-image" th:src="|${user.getImage()}|" alt="User Photo">
+
+    <div class="detail-row">
+      <span class="detail-label">First Name:</span>
+      <span class="detail-value" th:text="${user.getFirstName()}" id="firstNameValue"></span>
+      <input class="detail-input hidden" type="text" id="firstNameInput">
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Last Name:</span>
+      <span class="detail-value" th:text="${user.getLastName()}" id="lastNameValue"></span>
+      <input class="detail-input hidden" type="text" id="lastNameInput">
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Email:</span>
+      <span class="detail-value" th:text="${user.getEmail()}" id="emailValue"></span>
+      <input class="detail-input hidden" type="email" id="emailInput">
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">University:</span>
+      <span class="detail-value" th:text="${user.getUniversity()}" id="universityValue"></span>
+      <input class="detail-input hidden" type="text" id="universityInput">
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Department:</span>
+      <span class="detail-value" th:text="${user.getDepartment()}" id="departmentValue"></span>
+      <input class="detail-input hidden" type="text" id="departmentInput">
+    </div>
+    <div class="detail-row">
+      <span class="detail-label">Country:</span>
+      <span class="detail-value" th:text="${user.getCountry()}" id="countryValue"></span>
+      <input class="detail-input hidden" type="text" id="countryInput">
+    </div>
+  </div>
+  <!-- Redirect Button -->
+  <div class="upload-slide-container">
+    <a th:href="@{/view/upload/slide}">
+    <button class="upload-slide-button">Go to Upload Slide</button>
+    </a>
+  </div>
+</div>
+
+<script>
+  const editButton = document.getElementById("editButton");
+  const updateButton = document.getElementById("updateButton");
+
+  const valueFields = document.querySelectorAll(".detail-value");
+  const inputFields = document.querySelectorAll(".detail-input");
+
+  editButton.addEventListener("click", () => {
+    valueFields.forEach(field => field.classList.add("hidden"));
+    inputFields.forEach((field, index) => {
+      field.classList.remove("hidden");
+      field.value = valueFields[index].textContent;
+    });
+    editButton.classList.add("hidden");
+    updateButton.classList.remove("hidden");
+  });
+
+  updateButton.addEventListener("click", async () => {
+    const updatedData = {
+      firstName: document.getElementById("firstNameInput").value,
+      lastName: document.getElementById("lastNameInput").value,
+      email: document.getElementById("emailInput").value,
+      university: document.getElementById("universityInput").value,
+      department: document.getElementById("departmentInput").value,
+      country: document.getElementById("countryInput").value,
+    };
+
+    const userId =document.getElementById("userId").value;/* Replace with user ID logic */;
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/v1/user/update/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (response.ok) {
+        location.reload(); // Reload the page to reflect changes
+      } else {
+        alert("Failed to update user information");
+      }
+    } catch (error) {
+      console.error("Error updating user information:", error);
+    }
+  });
+</script>
+</body>
+</html>
+
+
+
+
