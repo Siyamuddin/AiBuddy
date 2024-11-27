@@ -56,7 +56,14 @@ public class OauthService implements AuthenticationSuccessHandler {
             localUser.setImage(image);
 
             LocalUser saved = localUserRepo.save(localUser);
-            mailSenderServices.sendEmail(email,"AiBuddy","Hi,"+firstName+" "+lastName+"\nWelcome to AiBuddy");
+            String subject = "Welcome to AiBuddy, " + firstName + "!";
+            String body = "Hi " + firstName + " " + lastName + ",\n\n" +
+                    "We’re thrilled to welcome you to AiBuddy! 🎉\n\n" +
+                    "Get ready to explore AI-powered solutions that make your journey smarter and more exciting. If you need any assistance, feel free to reach out to us.\n\n" +
+                    "Best Regards,\n" +
+                    "The AiBuddy Team";
+
+            mailSenderServices.sendEmail(email, subject, body);
             new DefaultRedirectStrategy().sendRedirect(request, response, "/view/profile");
         } else {
 

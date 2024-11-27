@@ -188,6 +188,11 @@
     <button class="upload-slide-button">Go to Upload Slide</button>
     </a>
   </div>
+  <div class="upload-slide-container">
+    <a th:href="@{/view/get/all/slide}">
+      <button class="upload-slide-button">Slides</button>
+    </a>
+  </div>
 </div>
 
 <script>
@@ -196,6 +201,7 @@
 
   const valueFields = document.querySelectorAll(".detail-value");
   const inputFields = document.querySelectorAll(".detail-input");
+
 
   editButton.addEventListener("click", () => {
     valueFields.forEach(field => field.classList.add("hidden"));

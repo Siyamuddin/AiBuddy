@@ -2,6 +2,7 @@ package com.example.SpringAI.Controller;
 
 import com.example.SpringAI.Model.LocalUser;
 import com.example.SpringAI.Repository.LocalUserRepo;
+import com.example.SpringAI.Repository.SlideRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ViewController {
     @Autowired
     private LocalUserRepo localUserRepo;
+    @Autowired
+    private SlideRepo slideRepo;
     @GetMapping("/register")
     public String showRegisterForm() {
         return "register";  // Thymeleaf template "register.html"
@@ -60,7 +63,13 @@ public class ViewController {
     }
 
     @GetMapping("/get/all/slide")
-    public String getAllSlide() {
+    public String getAllSlide(@AuthenticationPrincipal OAuth2User principal, Model model) {
+        String email = principal.getAttribute("email");
+        // Fetch user data from the database
+        LocalUser user=localUserRepo.findByEmail(email);
+        int size=slideRepo.findAllByLocalUserId(user.getId()).size();
+        model.addAttribute("user", user);
+        model.addAttribute("size",size);
         return "allSlide";  // Thymeleaf template "register.html"
     }
 

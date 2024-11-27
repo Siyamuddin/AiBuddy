@@ -182,9 +182,14 @@ public class SlideServiceImpl implements SlideServices {
         String questions = rag.generateRAGResponse(slide.getSlideContent(),"Generate "+ numberOfQuestions+ " possible short questions and answers from this lecture");
         slide.setGeneratedQuestions(questions);
         slideRepo.save(slide);
-        mailSenderServices.sendEmail(slide.getUserclass().getLocalUser().getEmail(),"AiBuddy mail Confirmation.",numberOfQuestions+" Short-Questions are generated from :"+slide.getSlideTitle());
 
-        return questions;
+        String recipientEmail = slide.getLocalUser().getEmail();
+        String slideTitle = slide.getSlideTitle();
+        String subject = "AI Buddy - Mail Confirmation";
+        String message = String.format(
+                "Hello %s,\n\nYour AI-generated short Questions are ready! 🎉\n\nFrom Slide: %s\n\nThank you for using AI Buddy to enhance your productivity.\n\nBest regards,\nThe AI Buddy Team",
+                slide.getLocalUser().getFirstName(), slideTitle);
+        mailSenderServices.sendEmail(recipientEmail, subject, message);        return questions;
     }
 
     @Override
@@ -193,8 +198,14 @@ public class SlideServiceImpl implements SlideServices {
         String MCQ=rag.generateRAGResponse2(slide.getSlideContent(),"Generate "+numberOfMCQs+" multiple-choice questions (MCQs) based on the content. Ensure that each question has 4 options, and highlight the correct answer.");
         slide.setGeneratedMCQ(MCQ);
         slideRepo.save(slide);
-        mailSenderServices.sendEmail(slide.getUserclass().getLocalUser().getEmail(),"AiBuddy mail Confirmation.",numberOfMCQs+" MCQs are generated from :"+slide.getSlideTitle());
 
+        String recipientEmail = slide.getLocalUser().getEmail();
+        String slideTitle = slide.getSlideTitle();
+        String subject = "AI Buddy - Mail Confirmation";
+        String message = String.format(
+                "Hello %s,\n\nYour AI-generated MCQs are ready! 🎉\n\nFrom Slide: %s\n\nThank you for using AI Buddy to enhance your productivity.\n\nBest regards,\nThe AI Buddy Team",
+                slide.getLocalUser().getFirstName(), slideTitle);
+        mailSenderServices.sendEmail(recipientEmail, subject, message);
         return MCQ;
     }
 
@@ -205,7 +216,16 @@ public class SlideServiceImpl implements SlideServices {
         String summary = rag.generateRAGResponse(slide.getSlideContent(),"Summarize the key points from the content above for effective revision.");
         slide.setSlideSummary(summary);
         slideRepo.save(slide);
-        mailSenderServices.sendEmail(slide.getUserclass().getLocalUser().getEmail(),"AiBuddy mail Confirmation.","A short summary is generated from :"+slide.getSlideTitle());
+
+        String recipientEmail = slide.getLocalUser().getEmail();
+        String slideTitle = slide.getSlideTitle();
+        String subject = "AI Buddy - Mail Confirmation";
+        String message = String.format(
+                "Hello %s,\n\nYour AI-generated short summary is ready! 🎉\n\nSlide Title: %s\n\nThank you for using AI Buddy to enhance your productivity.\n\nBest regards,\nThe AI Buddy Team",
+                slide.getLocalUser().getFirstName(), slideTitle
+        );
+
+        mailSenderServices.sendEmail(recipientEmail, subject, message);
 
         return summary;
     }
@@ -214,7 +234,6 @@ public class SlideServiceImpl implements SlideServices {
     public String writeAiQuery(Long slideId, String query) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
         String AiResponse=rag.generateRAGResponse(slide.getSlideContent(),query);
-
         return AiResponse;
     }
 
