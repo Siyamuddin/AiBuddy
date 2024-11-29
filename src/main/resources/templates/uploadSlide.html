@@ -126,7 +126,7 @@
         formData.append('file', pdfFile);
 
         try {
-            const uploadResponse = await fetch(`http://localhost:8080/api/v1/slide/upload/user/${userId}`, {
+            const uploadResponse = await fetch(`http://ragandlangchain4j-production.up.railway.app/api/v1/slide/upload/user/${userId}`, {
                 method: 'POST',
                 body: formData
             });
@@ -150,45 +150,6 @@
         }
     });
 
-
-
-
-    // document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-    //     e.preventDefault();
-    //
-    //     // Show the spinner
-    //     const spinnerContainer = document.getElementById('spinnerContainer');
-    //     spinnerContainer.style.display = 'flex';
-    //
-    //     const pdfFile = document.getElementById('pdfFile').files[0];
-    //     const formData = new FormData();
-    //     const userId = document.getElementById("userId").value;
-    //
-    //     formData.append('file', pdfFile);
-    //
-    //     try {
-    //         const uploadResponse = await fetch(`http://localhost:8080/api/v1/slide/upload/user/${userId}`, {
-    //             method: 'POST',
-    //             body: formData
-    //         });
-    //
-    //         if (!uploadResponse.ok) throw new Error('Upload failed');
-    //
-    //
-    //         // Hide the spinner
-    //         spinnerContainer.style.display = 'none';
-    //
-    //         // Display success message or preview (implement displayPreview)
-    //         alert('Upload successful!');
-    //
-    //
-    //     } catch (error) {
-    //         // Hide the spinner
-    //         spinnerContainer.style.display = 'none';
-    //
-    //         alert(`Error: ${error.message}`);
-    //     }
-    // });
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
