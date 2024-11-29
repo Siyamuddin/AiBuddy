@@ -24,10 +24,6 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 @Server(
                         description = "Local Dev",
                         url = "http://localhost:8080/"
-                ),
-                @Server(
-                        description = "Prod",
-                        url = "https://ragandlangchain4j-production.up.railway.app"
                 )
         }
 )
