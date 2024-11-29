@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 ),
                 @Server(
                         description = "Prod",
-                        url = "http://ragandlangchain4j-production.up.railway.app"
+                        url = "https://ragandlangchain4j-production.up.railway.app"
                 )
         }
 )
