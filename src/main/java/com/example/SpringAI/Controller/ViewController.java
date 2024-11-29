@@ -58,7 +58,8 @@ public class ViewController {
         // Fetch user data from the database
         LocalUser user=localUserRepo.findByEmail(email);
         model.addAttribute("user", user);
-
+        int size=slideRepo.findAllByLocalUserId(user.getId()).size();
+        model.addAttribute("size",size);
         return "uploadSlide";  // Thymeleaf template "register.html"
     }
 

@@ -129,12 +129,23 @@
                 opacity: 1;
             }
         }
+        #totalSlide {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #totalSlide span {
+            color: #4CAF50; /* Red color for the slide count */
+        }
     </style>
 </head>
 <body>
 <h1>Slide Dashboard</h1>
+<div id="totalSlide">
 <h3>Total Slide :<span th:text="${size}"></span></h3>
-
+</div>
 <div id="slides-container"></div>
 <input type="hidden" id="userId" th:value="${user.getId()}">
 
@@ -240,7 +251,7 @@
         section.appendChild(labelElem);
 
         const contentElem = document.createElement('p');
-        contentElem.textContent = content ? content.slice(0, 100) : 'No content available';
+        contentElem.textContent = content ? content.slice(0, 100) : 'Click generate to generate the content';
         section.appendChild(contentElem);
 
         if (content && content.length > 100) {

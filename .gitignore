@@ -4,6 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 src/main/resources/Secretes.env
+src/main/resources/templates/listUser.html
+src/main/resources/templates/userClass.html
+src/main/resources/templates/register.html
 ### STS ###
 .apt_generated
 .classpath
