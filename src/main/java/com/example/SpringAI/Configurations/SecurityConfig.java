@@ -52,18 +52,5 @@ public class SecurityConfig {
 
           return http.build();
     }
-    @Bean
-    public TomcatServletWebServerFactory servletContainer() {
-        TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
-        tomcat.addAdditionalTomcatConnectors(createStandardConnector());
-        return tomcat;
-    }
-
-    private Connector createStandardConnector() {
-        Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
-        connector.setScheme("https");
-        connector.setSecure(true);
-        return connector;
-    }
 
 }
