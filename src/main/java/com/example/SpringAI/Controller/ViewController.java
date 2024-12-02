@@ -20,10 +20,7 @@ public class ViewController {
     private LocalUserRepo localUserRepo;
     @Autowired
     private SlideRepo slideRepo;
-    @GetMapping("/register")
-    public String showRegisterForm() {
-        return "register";  // Thymeleaf template "register.html"
-    }
+
 
     @GetMapping("/users")
     public String listUsers() {
@@ -45,6 +42,10 @@ public class ViewController {
 
 
 
+    @GetMapping("/register")
+    public String showRegisterForm() {
+        return "register";  // Thymeleaf template "register.html"
+    }
 
     @GetMapping("/class")
     public String userClass() {
