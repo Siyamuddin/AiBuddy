@@ -37,22 +37,18 @@ public class SecurityConfig {
     };
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, Jackson2ObjectMapperBuilderCustomizer customizer) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PUBLIC_URLS).permitAll() // PUBLIC_URLS should include your registration endpoint.
-                        .requestMatchers("/login", "/register").permitAll()
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(auth-> auth
+                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .anyRequest()
+                        .authenticated()
                 )
-                .formLogin(form -> form
-                        .loginPage("/login") // Set the custom login page
-                        .defaultSuccessUrl("/home", true) // Redirect after successful login
-                        .failureUrl("/login?error=true") // Redirect on failure
-                        .permitAll()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(handler)
-                );
+                .oauth2Login(Customizer.withDefaults())
+                .oauth2Login(oauth2login->{
+                    oauth2login.successHandler(handler);
+                });
+
 
         return http.build();
     }
