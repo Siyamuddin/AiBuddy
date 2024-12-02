@@ -233,7 +233,7 @@
 
     if (confirmDeletion) {
       try {
-        const response = await fetch(`https://ragandlangchain4j-production.up.railway.app/api/v1/user/delete/${userId}`, {
+        const response = await fetch(`https://aibuddy.digital/api/v1/user/delete/${userId}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -241,7 +241,7 @@
         });
         if (response.ok) {
           alert("User deleted successfully.");
-          window.location.href = "https://ragandlangchain4j-production.up.railway.app/login";
+          window.location.href = "https://aibuddy.digital/login";
         } else {
           alert("Couldn't delete the user.");
         }
@@ -268,7 +268,7 @@
     const userId =document.getElementById("userId").value;/* Replace with user ID logic */;
 
     try {
-      const response = await fetch(`https://ragandlangchain4j-production.up.railway.app/api/v1/user/update/${userId}`, {
+      const response = await fetch(`https://aibuddy.digital/api/v1/user/update/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
