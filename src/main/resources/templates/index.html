@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landing Page</title>
+    <link rel="icon" href="https://media.licdn.com/dms/image/v2/D562DAQEroXIeXbbXZg/profile-treasury-image-shrink_800_800/profile-treasury-image-shrink_800_800/0/1733239015649?e=1733846400&v=beta&t=68nxhIzEshcUnfmMbwNhMPqIXslOSTBxfxcK--QlpKs">
+    <title>AiBuddy</title>
     <style>
         /* Resetting default styles */
         * {
@@ -15,7 +16,7 @@
         /* Body and background */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #6495e3;
+            background: linear-gradient(to bottom, #87CEFA, #6495E3);
             color: #fff;
             min-height: 100vh;
             display: flex;
@@ -27,11 +28,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.8);
             position: fixed;
             width: 100%;
             z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
         .logo {
@@ -48,11 +50,12 @@
             color: #fff;
             text-decoration: none;
             font-weight: bold;
-            transition: color 0.3s ease;
+            transition: color 0.3s ease, transform 0.3s ease;
         }
 
         .nav-links li a:hover {
-            color: #f0a500;
+            color: #F0A500;
+            transform: scale(1.1);
         }
 
         /* Login Section */
@@ -61,24 +64,70 @@
             justify-content: center;
             align-items: center;
             height: 70vh;
-            padding-top: 60px; /* To account for fixed navbar */
+            padding-top: 60px; /* Account for fixed navbar */
         }
 
+        /* Adding custom font */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+
         .btn {
-            background-color: #4CAF50;
-            color: #fff;
+            background: linear-gradient(45deg, #4CAF50, #67e767);
+            color: midnightblue;
             padding: 15px 30px;
             font-size: 1.2rem;
-            border: none;
-            border-radius: 25px;
+            font-family: 'Roboto', sans-serif;  /* Changed font family */
+            font-weight: 600;  /* Optional: Adjust the weight for boldness */
+            border: 2px solid transparent;
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border 0.3s;
+            z-index: 1;
+        }
+
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(120deg, #4CAF50, #67e767, #8df58d);
+            z-index: -1;
+            transform: rotate(0deg);
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .btn:hover::before {
+            transform: rotate(45deg);
         }
 
         .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5);
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 30px rgba(103, 231, 103, 0.5);
+            border: 2px solid #ffffff;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            width: 120%;
+            height: 120%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 0;
+            transition: transform 0.4s ease-out;
+        }
+
+        .btn:hover::after {
+            transform: translate(-50%, -50%) scale(1.2);
+            opacity: 1;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
         }
 
         /* Sections styling */
@@ -89,26 +138,41 @@
             margin: 20px auto;
             max-width: 800px;
             border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
         }
 
         .section h2 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin-bottom: 20px;
-            color: #f0a500;
+            color: #F0A500;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
         }
 
         .section p {
-            font-size: 1rem;
-            line-height: 1.5;
+            font-size: 1.1rem;
+            line-height: 1.8;
         }
 
         /* Footer styling */
         footer {
             text-align: center;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px 10px;
             font-size: 0.9rem;
+            color: #bbb;
             margin-top: auto;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        footer a {
+            color: #F0A500;
+            text-decoration: none;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #fff;
+            transform: scale(1.1);
         }
 
         /* Responsive adjustments */
@@ -117,7 +181,21 @@
                 flex-direction: column;
                 gap: 10px;
             }
+
+            .section {
+                padding: 40px 15px;
+                margin: 10px 15px;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+            }
+
+            .section p {
+                font-size: 1rem;
+            }
         }
+
 
     </style>
 </head>
@@ -148,7 +226,7 @@
 
         Welcome to AI Buddy, your smart study assistant!
 
-        We make exam preparation easier by transforming your lecture slides into study materials. Simply upload your PDFs, and our AI generates summaries, multiple-choice questions, and short-answer questions tailored to your needs.
+        We make exam preparation easier by transforming your lecture slides into study materials. Simply Login---> upload your PDFs, and our AI generates---> summaries,---> multiple-choice questions,---> short-answer questions tailored to your needs.
 
         With secure login, easy class management, and instant answers to your queries, AI Buddy helps you focus on learning effectively.
 
