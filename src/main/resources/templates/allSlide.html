@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slides Dashboard</title>
     <style>
+        /* Keep the original styles here */
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
@@ -139,18 +140,36 @@
         #totalSlide span {
             color: #4CAF50; /* Red color for the slide count */
         }
+        /* Additional styles for delete button */
+        .delete-button {
+            background-color: red;
+            color: white;
+            border: none;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+
+        .slide-card {
+            position: relative; /* Needed for positioning the delete button */
+        }
     </style>
 </head>
 <body>
 <h1>Slide Dashboard</h1>
 <div id="totalSlide">
-<h3>Total Slide :<span th:text="${size}"></span></h3>
+    <h3>Total Slide: <span th:text="${size}"></span></h3>
 </div>
 <div id="slides-container"></div>
 <input type="hidden" id="userId" th:value="${user.getId()}">
 
 <script>
-    // (JavaScript code remains the same as in your original code)
     async function fetchAndRenderSlides() {
         const userId = document.getElementById("userId").value;
         const response = await fetch(`https://aibuddy.digital/api/v1/slide/get/all/user/${userId}`);
@@ -164,10 +183,16 @@
             const card = document.createElement('div');
             card.classList.add('slide-card');
 
+            // Add delete button
+            const deleteButton = document.createElement('button');
+            deleteButton.classList.add('delete-button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.onclick = () => handleDeleteSlide(slide.id);
+            card.appendChild(deleteButton);
+
             // Title
             const title = document.createElement('h3');
             title.classList.add('card-title');
-
             title.textContent = slide.slideTitle;
             card.appendChild(title);
 
@@ -181,9 +206,27 @@
             card.appendChild(createGenerateSectionSummary('Summary', slide.slideSummary, () => generateSummary(slide.id)));
 
             // Slide Content Section
-            card.appendChild(createReadMoreSection('Slide Content',slide.slideContent));
+            card.appendChild(createReadMoreSection('Slide Content', slide.slideContent));
             slidesContainer.appendChild(card);
         });
+    }
+
+    async function handleDeleteSlide(slideId) {
+        const confirmation = confirm('Are you sure you want to delete this slide?');
+        if (confirmation) {
+            try {
+                const response = await fetch(`https://aibuddy.digital/api/v1/slide/delete/${slideId}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert('Slide deleted successfully.');
+                    await location.reload();// Refresh the slides after deletion
+                } else {
+                    alert('Failed to delete the slide. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error deleting slide:', error);
+                alert('An error occurred while deleting the slide. Please try again.');
+            }
+        }
     }
 
     function createGenerateSection(label, content, generateFunc) {
@@ -196,7 +239,6 @@
         const generateButton = document.createElement('button');
         generateButton.textContent = `Generated ${label} `;
         generateButton.onclick = async () => {
-            // JavaScript
             generateButton.classList.add('generating-button');
             generateButton.textContent = 'Generating...';
             const number = prompt(`Enter number of ${label.toLowerCase()} to generate:`);
@@ -218,11 +260,9 @@
         const generateButton = document.createElement('button');
         generateButton.textContent = `Generate ${label}`;
         generateButton.onclick = async () => {
-            // JavaScript
             generateButton.classList.add('generating-button');
             generateButton.textContent = 'Generating...';
-            const number = 1;
-            if (number) await generateFunc(number);
+            await generateFunc(1); // Fixed number for summary generation
             await fetchAndRenderSlides(); // Refresh slides after generation
         };
         section.appendChild(generateButton);
@@ -274,6 +314,7 @@
 
         return section;
     }
+
     fetchAndRenderSlides();
 </script>
 </body>

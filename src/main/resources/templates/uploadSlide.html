@@ -98,6 +98,7 @@
         </div>
         <button type="submit" class="upload-slide-button">Upload Slide</button>
     </form>
+    <div id="spinner-Container" class="spinner-container" style="display: none;">Loading...</div>
     <div>
         <a th:href="@{/view/get/all/slide}">
             <button type="submit" id="gotoSlide">Goto Slides(<span th:text="${size}"></span>)</button>
@@ -120,13 +121,21 @@
         spinnerContainer.style.display = 'flex';
 
         const pdfFile = document.getElementById('pdfFile').files[0];
+
+        // File size validation (10 MB = 10 * 1024 * 1024 bytes)
+        if (pdfFile.size > 10 * 1024 * 1024) {
+            spinnerContainer.style.display = 'none';
+            alert('Error: File size exceeds the 10 MB limit.');
+            return;
+        }
+
         const formData = new FormData();
         const userId = document.getElementById("userId").value;
 
         formData.append('file', pdfFile);
 
         try {
-            const uploadResponse = await fetch(`https://aibuddy.digital/api/v1/slide/upload/user/${userId}`, {
+            const uploadResponse = await fetch(`http://localhost:8080/api/v1/slide/upload/user/${userId}`, {
                 method: 'POST',
                 body: formData
             });
