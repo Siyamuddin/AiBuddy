@@ -17,7 +17,7 @@ public class Slide {
     @Column(name = "id", nullable = false)
     private Long id;
     private String slideTitle;
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String slideContent;
     @Column(columnDefinition = "TEXT")
     private String slideSummary;
