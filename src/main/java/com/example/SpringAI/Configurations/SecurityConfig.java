@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class SecurityConfig {
     @Autowired
     private OauthService handler;
-    public static final String[] PUBLIC_URLS={
+    public static final String[] PUBLIC_URLS= {
             "/auth/login/**",
             "/auth/register/**",
             "/v3/api-docs/**",
@@ -31,12 +31,8 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/webjars/**",
             "/swagger-ui.html",
-            "/swagger-ui/**",
-            "/api/v1/**",
-            "/api/v1/slide/**",
-            "/view/**"
+            "/swagger-ui/**"
     };
-
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, Jackson2ObjectMapperBuilderCustomizer customizer) throws Exception {
         http.csrf(csrf -> csrf.disable())
