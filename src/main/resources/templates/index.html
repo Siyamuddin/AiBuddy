@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page</title>
+    <style>
+        /* Resetting default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body and background */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #6495e3;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .logo {
+            height: 50px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links li a:hover {
+            color: #f0a500;
+        }
+
+        /* Login Section */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 70vh;
+            padding-top: 60px; /* To account for fixed navbar */
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Sections styling */
+        .section {
+            padding: 60px 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            margin: 20px auto;
+            max-width: 800px;
+            border-radius: 10px;
+        }
+
+        .section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #f0a500;
+        }
+
+        .section p {
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Footer styling */
+        footer {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .nav-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+<!-- Navigation Bar -->
+<header class="navbar">
+    <img src="aibuddy.png" alt="Website Logo" class="logo">
+    <nav>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+</header>
+
+<!-- Main Section -->
+<main>
+    <div class="login-container">
+        <button id="google-login" class="btn">Login with Google</button>
+    </div>
+</main>
+
+<!-- About Section -->
+<section id="about" class="section">
+    <h2>About Us</h2>
+    <p>
+        Write something engaging here about your website or business. This section is for introducing
+        your purpose, mission, and value to users.
+    </p>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="section">
+    <h2>Our Services</h2>
+    <p>
+        Describe the services you offer in this section. Use bullet points or a short list
+        for clarity if needed.
+    </p>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="section">
+    <h2>Contact Us</h2>
+    <p>
+        Provide details for users to get in touch with you. This can include an email address,
+        phone number, or a contact form.
+    </p>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p>&copy; 2024 Your Website aibuddy.digital All rights reserved.</p>
+</footer>
+
+<script>
+    // Redirect the user to the profile page on login
+    document.getElementById('google-login').addEventListener('click', () => {
+        window.location.href = '/view/profile';
+    });
+
+</script>
+</body>
+</html>
