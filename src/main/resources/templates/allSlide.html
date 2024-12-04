@@ -291,57 +291,26 @@
         labelElem.textContent = label;
         section.appendChild(labelElem);
 
-        if (content) {
-            if (label === 'Questions') {
-                // Split content into individual questions and answers
-                const items = content.match(/\d\.\sQ:.*?A:.*?(?=(\d\.|$))/gs);
+        const contentElem = document.createElement('p');
+        contentElem.textContent = content ? content.slice(0, 100) : 'Click generate to generate the content';
+        section.appendChild(contentElem);
 
-                const listContainer = document.createElement('div');
-                items.forEach((item) => {
-                    const questionAnswer = document.createElement('p');
-                    questionAnswer.textContent = item.trim();
-                    listContainer.appendChild(questionAnswer);
-                });
-                section.appendChild(listContainer);
-            } else if (label === 'MCQs') {
-                // Split content into individual MCQs
-                const items = content.match(/\d\.\s.*?Correct answer:.*?(?=(\d\.|$))/gs);
+        if (content && content.length > 100) {
+            const toggleLink = document.createElement('span');
+            toggleLink.textContent = ' Read More';
+            toggleLink.classList.add('read-more');
 
-                const listContainer = document.createElement('div');
-                items.forEach((item) => {
-                    const mcq = document.createElement('p');
-                    mcq.textContent = item.trim();
-                    listContainer.appendChild(mcq);
-                });
-                section.appendChild(listContainer);
-            } else {
-                // Handle other content types (e.g., Summary, Slide Content)
-                const contentElem = document.createElement('p');
-                contentElem.textContent = content.slice(0, 100);
-                section.appendChild(contentElem);
-
-                if (content.length > 100) {
-                    const toggleLink = document.createElement('span');
+            toggleLink.onclick = () => {
+                if (toggleLink.textContent === ' Read More') {
+                    contentElem.textContent = content;
+                    toggleLink.textContent = ' Read Less';
+                } else {
+                    contentElem.textContent = content.slice(0, 100);
                     toggleLink.textContent = ' Read More';
-                    toggleLink.classList.add('read-more');
-
-                    toggleLink.onclick = () => {
-                        if (toggleLink.textContent === ' Read More') {
-                            contentElem.textContent = content;
-                            toggleLink.textContent = ' Read Less';
-                        } else {
-                            contentElem.textContent = content.slice(0, 100);
-                            toggleLink.textContent = ' Read More';
-                        }
-                    };
-
-                    section.appendChild(toggleLink);
                 }
-            }
-        } else {
-            const placeholder = document.createElement('p');
-            placeholder.textContent = 'Click generate to generate the content';
-            section.appendChild(placeholder);
+            };
+
+            section.appendChild(toggleLink);
         }
 
         return section;
