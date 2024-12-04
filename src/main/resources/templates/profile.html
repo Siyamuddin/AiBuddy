@@ -10,7 +10,7 @@
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background: #f4f4f9;
+      background: rgb(100, 149, 227);
       color: #333;
     }
 
@@ -204,7 +204,7 @@
   </div>
   <div class="upload-slide-container">
     <a th:href="@{/view/get/all/slide}">
-      <button class="upload-slide-button">Slides</button>
+      <button class="upload-slide-button">Slides(<span th:text="${size}"></span>)</button>
     </a>
   </div>
 </div>
