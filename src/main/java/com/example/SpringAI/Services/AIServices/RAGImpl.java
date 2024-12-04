@@ -64,19 +64,13 @@ public class RAGImpl {
 
         // Embed segments (convert them into vectors that represent the meaning) using embedding model
         EmbeddingModel embeddingModel = new BgeSmallEnV15QuantizedEmbeddingModel();
+
         List<Embedding> embeddings = embeddingModel.embedAll(segments).content();
 
-        // Store embeddings into embedding store for further search / retrieval
-//        MongoDbEmbeddingStore embeddingStore = MongoDbEmbeddingStore.builder()
-//                .fromClient(client)
-//                .databaseName("ai_buddy")
-//                .collectionName("ai_collection")
-//                .indexName("default")
-//                .build();
-//        String connectionString = "mongodb+srv://siyamuddin:<17@siyam@17>@aibuddy.b89pw.mongodb.net/?retryWrites=true&w=majority&appName=AiBuddy";
-//        client = MongoClients.create(connectionString);
         EmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+
         embeddingStore.addAll(embeddings, segments);
+
         // Embed the question
         String information = null;
         List<String> questions=configLangChain.simplifyQuestions(prompt);
@@ -103,10 +97,10 @@ public class RAGImpl {
         PromptTemplate promptTemplate = PromptTemplate.from(
                 "Generate the following requirement to the best of your ability:\n"
                         + "\n"
-                        + "requirement:\n"
+                        + "requirements:\n"
                         + "{{question}}\n"
                         + "\n"
-                        + "Base your answer on the following information:\n"
+                        + "plesse generate your response based on the following information:\n"
                         + "{{information}}");
 
 
@@ -128,16 +122,6 @@ public class RAGImpl {
 
     public String generateRAGResponse2(String resource, String prompt){
 
-        // Create a prompt for the model that includes question and relevant embeddings
-//        PromptTemplate promptTemplate = PromptTemplate.from(
-//                "Generate the following requirement to the best of your ability:\n"
-//                        + "\n"
-//                        + "requirement:\n"
-//                        + "{{question}}\n"
-//                        + "\n"
-//                        + "Base your answer on the following information:\n"
-//                        + "{{information}}");
-
         PromptTemplate promptTemplate = PromptTemplate.from(
                 "I have a lecture slide with the following content:\n"
                         + "{{information}}\n"
@@ -148,9 +132,6 @@ public class RAGImpl {
                         + "\n"
                         + "Be concise and focus on the most important information for each task.");
 
-        //                        + "1. Summarize the key points from the content above for effective revision.\n"
-//                        + "2. Create a set of 3-5 multiple-choice questions (MCQs) based on the content. Ensure that each question has 4 options, and highlight the correct answer.\n"
-//                        + "3. Generate 2-3 short-answer questions that could be asked in an exam based on this content.\n"
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("question", prompt);
