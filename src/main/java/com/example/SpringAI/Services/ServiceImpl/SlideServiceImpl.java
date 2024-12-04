@@ -116,7 +116,7 @@ public class SlideServiceImpl implements SlideServices {
 
 
 
-                                                    //Project
+    //Project
 
 
     @Override
@@ -179,7 +179,7 @@ public class SlideServiceImpl implements SlideServices {
     @Override
     public String generateShortQuestions(Long slideId, String numberOfQuestions) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
-        String questions = rag.generateRAGResponse2(slide.getSlideContent()," You are an AI assistant who helps student prepare for exam using their lecture slide, please Generate "+ numberOfQuestions+ " short questions and answers from this lecture that may asked int exam");
+        String questions = rag.generateRAGResponse(slide.getSlideContent(),"Generate "+ numberOfQuestions+ " possible short questions and answers from this lecture");
         slide.setGeneratedQuestions(questions);
         slideRepo.save(slide);
 
@@ -195,7 +195,7 @@ public class SlideServiceImpl implements SlideServices {
     @Override
     public String generateMCQ(Long slideId, String numberOfMCQs) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
-        String MCQ=rag.generateRAGResponse2(slide.getSlideContent()," You are an AI assistant who helps student prepare for exam using their lecture slide, please Generate "+numberOfMCQs+" important multiple-choice questions (MCQs) based on the content. Ensure that each question has 4 options, and highlight the correct answer.");
+        String MCQ=rag.generateRAGResponse2(slide.getSlideContent(),"Generate "+numberOfMCQs+" multiple-choice questions (MCQs) based on the content. Ensure that each question has 4 options, and highlight the correct answer.");
         slide.setGeneratedMCQ(MCQ);
         slideRepo.save(slide);
 
@@ -213,7 +213,7 @@ public class SlideServiceImpl implements SlideServices {
     public String generateSummary(Long slideId) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
         //getting the AI generated summary of our given text.
-        String summary = rag.generateRAGResponse2(slide.getSlideContent(),"Summarize the key points from the content above for effective revision, don't miss any important point.");
+        String summary = rag.generateRAGResponse(slide.getSlideContent(),"Summarize the key points from the content above for effective revision.");
         slide.setSlideSummary(summary);
         slideRepo.save(slide);
 
@@ -233,7 +233,7 @@ public class SlideServiceImpl implements SlideServices {
     @Override
     public String writeAiQuery(Long slideId, String query) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
-        String AiResponse=rag.generateRAGResponse2(slide.getSlideContent(),"  You are an AI assistant who helps student prepare for exam using their lecture slide, please answer the question "+query);
+        String AiResponse=rag.generateRAGResponse(slide.getSlideContent(),query);
         return AiResponse;
     }
 
