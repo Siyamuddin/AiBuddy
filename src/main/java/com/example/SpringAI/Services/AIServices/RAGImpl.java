@@ -95,7 +95,7 @@ public class RAGImpl {
 
         // Create a prompt for the model that includes question and relevant embeddings
         PromptTemplate promptTemplate = PromptTemplate.from(
-                "Generate the following requirement to the best of your ability:\n"
+                "Generate the following requirement to the best of your ability and give response in json format:\n"
                         + "\n"
                         + "requirements:\n"
                         + "{{question}}\n"

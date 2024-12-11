@@ -6,6 +6,168 @@
     <title>PDF Slide Upload</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <style>
+        /* Keep the original styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: rgb(100, 149, 227);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        #slides-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .slide-card {
+            background-color: rgba(255, 255, 255, 0.87);
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 15px 0;
+            width: 100%;
+            max-width: 500px;
+            transition: transform 0.2s;
+        }
+
+        .slide-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #343a40;
+            margin-bottom: 15px;
+        }
+
+        .section {
+            margin-bottom: 15px;
+        }
+
+        .section h4 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #495057;
+        }
+
+        .section p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #6c757d;
+        }
+
+        .read-more {
+            font-size: 0.9rem;
+            color: #4CAF50;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #4CAF50;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .slide-card {
+                max-width: 90%;
+                padding: 15px;
+            }
+
+            button {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+        }
+        /* CSS */
+        .generating-button {
+            /* Base styles */
+            /* ... */
+
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        #totalSlide {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #totalSlide span {
+            color: #4CAF50; /* Red color for the slide count */
+        }
+        /* Additional styles for delete button */
+        .delete-button {
+            background-color: red;
+            color: white;
+            border: none;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+
+        .slide-card {
+            position: relative; /* Needed for positioning the delete button */
+        }
+
+
+
+
+
+
+
         body {
             background-color: #f8f9fa;
         }
@@ -159,6 +321,162 @@
         }
     });
 
+</script>
+
+<h1>Slide Dashboard</h1>
+<div id="totalSlide">
+    <h3>Total Slide: <span th:text="${size}"></span></h3>
+</div>
+<div id="slides-container"></div>
+
+
+<script>
+    async function fetchAndRenderSlides() {
+        const userId = document.getElementById("userId").value;
+        const response = await fetch(`http://localhost:8080/api/v1/slide/get/all/user/${userId}`);
+        const data = await response.json();
+
+        const slidesContainer = document.getElementById('slides-container');
+        slidesContainer.innerHTML = ''; // Clear existing content
+
+        data.forEach(slide => {
+            // Create slide card
+            const card = document.createElement('div');
+            card.classList.add('slide-card');
+
+            // Add delete button
+            const deleteButton = document.createElement('button');
+            deleteButton.classList.add('delete-button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.onclick = () => handleDeleteSlide(slide.id);
+            card.appendChild(deleteButton);
+
+            // Title
+            const title = document.createElement('h3');
+            title.classList.add('card-title');
+            title.textContent = slide.slideTitle;
+            card.appendChild(title);
+
+            // Generate Short Questions Section
+            card.appendChild(createGenerateSection('Questions', slide.generatedQuestions, () => generateShortQuestions(slide.id)));
+
+            // Generate MCQs Section
+            card.appendChild(createGenerateSection('MCQs', slide.generatedMCQ, () => generateMCQs(slide.id)));
+
+            // Generate Summary Section
+            card.appendChild(createGenerateSectionSummary('Summary', slide.slideSummary, () => generateSummary(slide.id)));
+
+            // Slide Content Section
+            card.appendChild(createReadMoreSection('Slide Content', slide.slideContent));
+            slidesContainer.appendChild(card);
+        });
+    }
+
+    async function handleDeleteSlide(slideId) {
+        const confirmation = confirm('Are you sure you want to delete this slide?');
+        if (confirmation) {
+            try {
+                const response = await fetch(`http://localhost:8080/api/v1/slide/delete/${slideId}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert('Slide deleted successfully.');
+                    await location.reload();// Refresh the slides after deletion
+                } else {
+                    alert('Failed to delete the slide. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error deleting slide:', error);
+                alert('An error occurred while deleting the slide. Please try again.');
+            }
+        }
+    }
+
+    function createGenerateSection(label, content, generateFunc) {
+        const section = document.createElement('div');
+        section.classList.add('section');
+
+        const contentContainer = createReadMoreSection(label, content);
+        section.appendChild(contentContainer);
+
+        const generateButton = document.createElement('button');
+        generateButton.textContent = `Generated ${label} `;
+        generateButton.onclick = async () => {
+            generateButton.classList.add('generating-button');
+            generateButton.textContent = 'Generating...';
+            const number = prompt(`Enter number of ${label.toLowerCase()} to generate:`);
+            if (number) await generateFunc(number);
+            await fetchAndRenderSlides(); // Refresh slides after generation
+        };
+        section.appendChild(generateButton);
+
+        return section;
+    }
+
+    function createGenerateSectionSummary(label, content, generateFunc) {
+        const section = document.createElement('div');
+        section.classList.add('section');
+
+        const contentContainer = createReadMoreSection(label, content);
+        section.appendChild(contentContainer);
+
+        const generateButton = document.createElement('button');
+        generateButton.textContent = `Generate ${label}`;
+        generateButton.onclick = async () => {
+            generateButton.classList.add('generating-button');
+            generateButton.textContent = 'Generating...';
+            await generateFunc(1); // Fixed number for summary generation
+            await fetchAndRenderSlides(); // Refresh slides after generation
+        };
+        section.appendChild(generateButton);
+
+        return section;
+    }
+
+    async function generateShortQuestions(slideID, numQuestions) {
+        await fetch(`http://localhost:8080/api/v1/slide/generate/sq/${slideID}/${numQuestions}`);
+    }
+
+    async function generateMCQs(slideID, numMCQs) {
+        await fetch(`http://localhost:8080/api/v1/slide/generate/mcq/${slideID}/${numMCQs}`);
+    }
+
+    async function generateSummary(slideID) {
+        await fetch(`http://localhost:8080/api/v1/slide/generate/summary/${slideID}`);
+    }
+
+
+    function createReadMoreSection(label, content) {
+        const section = document.createElement('div');
+        section.classList.add('section');
+
+        const labelElem = document.createElement('h4');
+        labelElem.textContent = label;
+        section.appendChild(labelElem);
+
+        const contentElem = document.createElement('p');
+        contentElem.textContent = content ? content.slice(0, 100) : 'Click generate to generate the content';
+        section.appendChild(contentElem);
+
+        if (content && content.length > 100) {
+            const toggleLink = document.createElement('span');
+            toggleLink.textContent = ' Read More';
+            toggleLink.classList.add('read-more');
+
+            toggleLink.onclick = () => {
+                if (toggleLink.textContent === ' Read More') {
+                    contentElem.textContent = content;
+                    toggleLink.textContent = ' Read Less';
+                } else {
+                    contentElem.textContent = content.slice(0, 100);
+                    toggleLink.textContent = ' Read More';
+                }
+            };
+
+            section.appendChild(toggleLink);
+        }
+
+        return section;
+    }
+    fetchAndRenderSlides();
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

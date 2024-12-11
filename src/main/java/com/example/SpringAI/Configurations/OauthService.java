@@ -64,7 +64,7 @@ public class OauthService implements AuthenticationSuccessHandler {
                     "The AiBuddy Team";
 
             mailSenderServices.sendEmail(email, subject, body);
-            new DefaultRedirectStrategy().sendRedirect(request, response, "/view/profile");
+            new DefaultRedirectStrategy().sendRedirect(request,response,"/view/profile");
         } else {
 
             new DefaultRedirectStrategy().sendRedirect(request, response, "/view/profile");

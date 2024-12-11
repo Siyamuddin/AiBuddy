@@ -34,28 +34,26 @@ public class SecurityConfig {
 //            "/api/v1/slide/**"
     };
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, Jackson2ObjectMapperBuilderCustomizer customizer) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/","/auth/login/**","/auth/register/**","/v3/api-docs/**",
-                                "/v2/api-docs/**",
-                                "/swagger-resources/**",
-                                "/swagger-ui/**",
-                                "/webjars/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/login") // Match the root URL correctly
-                        .permitAll() // Allow access to the root URL and public URLs without authentication
+                        .requestMatchers(
+                                "/view/upload/slide",  // Allow the upload page
+                                "/",
+                                "/auth/login/**",
+                                "/auth/register/**"
+                        )
+                        .permitAll() // Permit these endpoints without authentication
                         .anyRequest()
-                        .authenticated()
+                        .authenticated() // Require authentication for other endpoints
                 )
-                .oauth2Login(Customizer.withDefaults())
-                .oauth2Login(oauth2login -> {
-                    oauth2login.successHandler(handler);
-                });
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(handler) // Define a custom success handler
+                );
 
         return http.build();
     }
+
 
 
 //    @Bean

@@ -124,7 +124,8 @@
 <body>
 <!-- Navigation Bar -->
 <header class="navbar">
-    <img src="aibuddy.png" alt="Website Logo" class="logo">
+    <img th:src="@{static/image/aibuddy.png}" alt="Website Logo">
+<!--    <img src="aibuddy.png" alt="Website Logo" class="logo">-->
     <nav>
         <ul class="nav-links">
             <li><a href="#about">About</a></li>
@@ -140,8 +141,6 @@
         <button id="google-login" class="btn">Login with Google</button>
     </div>
 </main>
-
-<!-- About Section -->
 <section id="about" class="section">
     <h2>About Us</h2>
     <p>
