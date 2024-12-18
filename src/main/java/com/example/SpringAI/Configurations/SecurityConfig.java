@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class SecurityConfig {
     @Autowired
     private OauthService handler;
-    public static final String[] PUBLIC_URLS={
+    public static final String[] PUBLIC_URLS= {
             "/auth/login/**",
             "/auth/register/**",
             "/v3/api-docs/**",
@@ -31,25 +31,28 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/webjars/**",
             "/swagger-ui.html",
-            "/swagger-ui/**",
-            "/api/v1/**",
-            "/api/v1/slide/**",
-            "/view/**"
+            "/swagger-ui/**"
     };
-
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, Jackson2ObjectMapperBuilderCustomizer customizer) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth-> auth
-                        .requestMatchers(PUBLIC_URLS).permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/","/auth/login/**","/auth/register/**","/v3/api-docs/**",
+                                "/v2/api-docs/**",
+                                "/swagger-resources/**",
+                                "/swagger-ui/**",
+                                "/webjars/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/login") // Match the root URL correctly
+                        .permitAll() // Allow access to the root URL and public URLs without authentication
                         .anyRequest()
                         .authenticated()
                 )
                 .oauth2Login(Customizer.withDefaults())
-                .oauth2Login(oauth2login->{
+                .oauth2Login(oauth2login -> {
                     oauth2login.successHandler(handler);
                 });
-
 
         return http.build();
     }

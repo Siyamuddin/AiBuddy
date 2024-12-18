@@ -1,8 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="description" content="Revolutionize learning with AiBuddy! Upload lecture slides, generate summaries, MCQs, and short-answer questions, and prepare for exams with AI-powered insights. Secure, efficient, and user-friendly.">
+    <meta name="keywords" content="AI-powered study tools, class management, lecture slides processing, exam preparation, MCQ generation, short-answer questions, Java Spring Boot, JWT authentication, Llama AI, Langchain4j, educational technology">
+    <meta name="author" content="UDDIN SIYAM">
+    <meta property="og:title" content="AiBuddy - AI-Powered Student Class Management System">
+    <meta property="og:description" content="Transform the way students prepare for exams with AiBuddy. Upload lecture slides, generate summaries, MCQs, and more using AI-powered insights.">
+    <meta property="og:image" content="https://media.licdn.com/dms/image/v2/D562DAQEroXIeXbbXZg/profile-treasury-image-shrink_800_800/profile-treasury-image-shrink_800_800/0/1733239015649?e=1733846400&v=beta&t=68nxhIzEshcUnfmMbwNhMPqIXslOSTBxfxcK--QlpKs">
+    <meta property="og:url" content="https://aibuddy.digital">
+    <meta property="og:type" content="website">
+    <meta name="language" content="en">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://media.licdn.com/dms/image/v2/D562DAQEroXIeXbbXZg/profile-treasury-image-shrink_800_800/profile-treasury-image-shrink_800_800/0/1733239015649?e=1733846400&v=beta&t=68nxhIzEshcUnfmMbwNhMPqIXslOSTBxfxcK--QlpKs">
     <title>PDF Slide Upload</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <style>
@@ -98,6 +112,7 @@
         </div>
         <button type="submit" class="upload-slide-button">Upload Slide</button>
     </form>
+    <div id="spinner-Container" class="spinner-container" style="display: none;">Loading...</div>
     <div>
         <a th:href="@{/view/get/all/slide}">
             <button type="submit" id="gotoSlide">Goto Slides(<span th:text="${size}"></span>)</button>
@@ -120,6 +135,14 @@
         spinnerContainer.style.display = 'flex';
 
         const pdfFile = document.getElementById('pdfFile').files[0];
+
+        // File size validation (10 MB = 10 * 1024 * 1024 bytes)
+        if (pdfFile.size > 10 * 1024 * 1024) {
+            spinnerContainer.style.display = 'none';
+            alert('Error: File size exceeds the 10 MB limit.');
+            return;
+        }
+
         const formData = new FormData();
         const userId = document.getElementById("userId").value;
 
@@ -150,6 +173,19 @@
         }
     });
 
+</script>
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "name": "AiBuddy",
+        "description": "AI-powered student class management system that simplifies lecture slide processing and exam preparation.",
+        "url": "https://aibuddy.digital",
+        "sameAs": [
+            "https://uddin.netlify.app",
+            "https://www.linkedin.com/in/uddin-siyam-8953511ab/"
+        ]
+    }
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

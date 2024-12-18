@@ -81,21 +81,21 @@ public class RAGImpl {
         String information = null;
         List<String> questions=configLangChain.simplifyQuestions(prompt);
         for(int i=0;i<questions.size();i++){
-        Embedding questionEmbedding = embeddingModel.embed(questions.get(i)).content();
-        // Find relevant embeddings in embedding store by semantic similarity
-        // You can play with parameters below to find a sweet spot for your specific use case
-        int maxResults = 2;
-        double minScore = 0.3;
-        EmbeddingSearchRequest embeddingSearchRequest=EmbeddingSearchRequest.builder()
-                .queryEmbedding(questionEmbedding)
-                .maxResults(maxResults)
-                .minScore(minScore)
-                .build();
-        EmbeddingSearchResult<TextSegment> relevantEmbeddings = embeddingStore.search(embeddingSearchRequest);
+            Embedding questionEmbedding = embeddingModel.embed(questions.get(i)).content();
+            // Find relevant embeddings in embedding store by semantic similarity
+            // You can play with parameters below to find a sweet spot for your specific use case
+            int maxResults = 2;
+            double minScore = 0.3;
+            EmbeddingSearchRequest embeddingSearchRequest=EmbeddingSearchRequest.builder()
+                    .queryEmbedding(questionEmbedding)
+                    .maxResults(maxResults)
+                    .minScore(minScore)
+                    .build();
+            EmbeddingSearchResult<TextSegment> relevantEmbeddings = embeddingStore.search(embeddingSearchRequest);
 
-        information += relevantEmbeddings.matches().stream()
-                .map(match -> match.embedded().text())
-                .collect(joining("\n\n"));
+            information += relevantEmbeddings.matches().stream()
+                    .map(match -> match.embedded().text())
+                    .collect(joining("\n\n"));
         }
 
 
