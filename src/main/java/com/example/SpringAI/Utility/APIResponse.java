@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+
 @Component
 public class APIResponse {
     private String massage;
