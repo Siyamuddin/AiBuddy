@@ -149,7 +149,7 @@
         formData.append('file', pdfFile);
 
         try {
-            const uploadResponse = await fetch(`https://aibuddy.digital/api/v1/slide/upload/user/${userId}`, {
+            const uploadResponse = await fetch(`http://localhost:8080/api/v1/slide/upload/user/${userId}`, {
                 method: 'POST',
                 body: formData
             });

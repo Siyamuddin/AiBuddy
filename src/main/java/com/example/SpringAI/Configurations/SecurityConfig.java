@@ -44,7 +44,7 @@ public class SecurityConfig {
                                 "/webjars/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/login") // Match the root URL correctly
+                                "/login","**") // Match the root URL correctly
                         .permitAll() // Allow access to the root URL and public URLs without authentication
                         .anyRequest()
                         .authenticated()

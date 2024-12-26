@@ -24,10 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.loadDocument;
 
 @Service
 @Slf4j
@@ -49,21 +48,38 @@ public class SlideServiceImpl implements SlideServices {
     public Long uploadSlide(Long classId, MultipartFile file) throws IOException {
         //checking if the userClass is available or not
         UserClass userClass=userClassRepo.findById(classId).orElseThrow(()-> new ResourceNotFoundException("Class","class ID:",classId));
-        log.info("Email :"+userClass.getLocalUser().getEmail());
-        String text= null;
+
+// List to store text from each page
+        List<String> pagesText = new ArrayList<>();
+
         try {
-            //converts the PDF file in to String Text
+            // Check if the document has pages
             PDDocument document=PDDocument.load(file.getInputStream());
-            PDFTextStripper pdfStripper = new PDFTextStripper();
-            text = pdfStripper.getText(document);
+            if (!document.isEncrypted()) {
+                PDFTextStripper stripper = new PDFTextStripper();
+                int totalPages = document.getNumberOfPages();
+
+                for (int i = 0; i < totalPages; i++) {
+                    stripper.setStartPage(i + 1);
+                    stripper.setEndPage(i + 1);
+                    String pageText = stripper.getText(document);
+                    pagesText.add(pageText);
+                }
+            }
         } catch (IOException e) {
-            log.error("Error: "+e);
+            e.printStackTrace();
         }
+
+        String content = pagesText.stream()
+                .map(page -> page.replaceAll("\n", " ") + "\n\n\n")
+                .collect(Collectors.joining());
+
+        log.info("Content :"+content);
+        System.out.println(content);
         //Creating a slide object.
         Slide slide=new Slide();
-
+        slide.setSlideContent(content);
         //Setting up the slide fields.
-        slide.setSlideContent(text);
         slide.setSlideTitle(file.getOriginalFilename());
         //Setting slides userClass
         slide.setUserclass(userClass);
@@ -122,22 +138,36 @@ public class SlideServiceImpl implements SlideServices {
     @Override
     public SlideDTO userSlideUpload(Long userId, MultipartFile file) {
         //checking if the userClass is available or not
-        LocalUser localUser;
-        localUser=localUserRepo.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","ID",userId));
-        String text= null;
+        LocalUser localUser=localUserRepo.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","ID",userId));
+        List<String> pagesText = new ArrayList<>();
+
         try {
-            //converts the PDF file in to String Text
+            // Check if the document has pages
             PDDocument document=PDDocument.load(file.getInputStream());
-            PDFTextStripper pdfStripper = new PDFTextStripper();
-            text = pdfStripper.getText(document);
+            if (!document.isEncrypted()) {
+                PDFTextStripper stripper = new PDFTextStripper();
+                int totalPages = document.getNumberOfPages();
+
+                for (int i = 0; i < totalPages; i++) {
+                    stripper.setStartPage(i + 1);
+                    stripper.setEndPage(i + 1);
+                    String pageText = stripper.getText(document);
+                    pagesText.add(pageText);
+                }
+            }
         } catch (IOException e) {
-            log.error("Error: "+e);
+            e.printStackTrace();
         }
+
+        String content = pagesText.stream()
+                .map(page -> page.replaceAll("\n", " ") + "\n\n\n")
+                .collect(Collectors.joining());
+
         //Creating a slide object.
         Slide slide=new Slide();
 
         //Setting up the slide fields.
-        slide.setSlideContent(text);
+        slide.setSlideContent(content);
         slide.setSlideTitle(file.getOriginalFilename());
         //Setting slides userClass
         slide.setLocalUser(localUser);
@@ -213,7 +243,13 @@ public class SlideServiceImpl implements SlideServices {
     public String generateSummary(Long slideId) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
         //getting the AI generated summary of our given text.
-        String summary = rag.generateRAGResponse(slide.getSlideContent(),"Summarize the key points from the content above for effective revision.");
+        String prompt="""
+                The provided content contains summaries of individual pages from a lecture slide.
+                 Your task is to synthesize these summaries into a cohesive and concise overall summary of the lecture.
+                  The goal is to make the content easier to review and prepare for the exam.
+                """;
+
+        String summary = rag.generateRAGResponse2(slide.getSlideContent(),prompt);
         slide.setSlideSummary(summary);
         slideRepo.save(slide);
 

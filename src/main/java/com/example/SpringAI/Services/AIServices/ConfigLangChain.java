@@ -39,7 +39,7 @@ public class ConfigLangChain {
     @Value("${embd.api.key}")
     private String EMBD_API_KEY;
 
-        @Bean
+    @Bean
     public ChatLanguageModel chatClient(){
         ChatLanguageModel model= OpenAiChatModel.builder()
                 .baseUrl(Base_URL)
@@ -50,25 +50,7 @@ public class ConfigLangChain {
                 .build();
         return  model;
     }
-//    @Bean
-//    public MistralAiStreamingChatModel chatClient(){
-//        MistralAiStreamingChatModel model = MistralAiStreamingChatModel.builder()
-//                .apiKey(API_KEY)
-//                .modelName(MODEL_NAME)
-//                .build();
-//
-//        return model;
-//    }
 
-//    @Bean
-//    public ChatLanguageModel chatClient() {
-//    HuggingFaceChatModel chatModel = HuggingFaceChatModel.builder()
-//            .accessToken(API_KEY)
-//            .modelId(MODEL_NAME)
-//            .waitForModel(true)
-//            .build();
-//    return chatModel;
-//}
     @Bean
     public EmbeddingModel embeddingModel() {
         EmbeddingModel embeddingModel = HuggingFaceEmbeddingModel.builder()
@@ -89,7 +71,7 @@ public class ConfigLangChain {
         for (String question : splitQuestions) {
             questions.add(question.trim()); // Trim each question to remove any extra spaces
         }
-
+        log.info("Generated questions: "+questions);
         return questions;
     }
 
@@ -101,7 +83,6 @@ public class ConfigLangChain {
                     " By generating multiple perspectives on the user question, your goal is to help the user overcome some of the limitations of the distance-based similarity search.\n" +
                     "Provide these alternative questions separated by newlines, Original question:"+userQuerry+"?";
             String response=chatClient().generate(prompt);
-            log.info("Generated questions: "+response);
 
             List<String> ls=splitQuestions(response);
             return ls;

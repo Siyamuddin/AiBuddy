@@ -246,7 +246,7 @@
 
     if (confirmDeletion) {
       try {
-        const response = await fetch(`https://aibuddy.digital/api/v1/user/delete/${userId}`, {
+        const response = await fetch(`http://localhost:8080/api/v1/user/delete/${userId}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -254,7 +254,7 @@
         });
         if (response.ok) {
           alert("User deleted successfully.");
-          window.location.href = "https://aibuddy.digital/login";
+          window.location.href = "http://localhost:8080/login";
         } else {
           alert("Couldn't delete the user.");
         }
@@ -281,7 +281,7 @@
     const userId =document.getElementById("userId").value;/* Replace with user ID logic */;
 
     try {
-      const response = await fetch(`https://aibuddy.digital/api/v1/user/update/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/v1/user/update/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
