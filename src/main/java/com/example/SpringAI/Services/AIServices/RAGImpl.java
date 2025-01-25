@@ -1,18 +1,20 @@
 package com.example.SpringAI.Services.AIServices;
+import com.example.SpringAI.Exceptions.DatasetNotAvailable;
 import dev.langchain4j.data.document.Document;
+import dev.langchain4j.data.document.DocumentParser;
 import dev.langchain4j.data.document.DocumentSplitter;
+import dev.langchain4j.data.document.parser.apache.pdfbox.ApachePdfBoxDocumentParser;
 import dev.langchain4j.data.document.splitter.DocumentByParagraphSplitter;
 import dev.langchain4j.data.document.splitter.DocumentByRegexSplitter;
-import dev.langchain4j.data.document.splitter.DocumentByWordSplitter;
-import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.embedding.onnx.bgesmallenv15q.BgeSmallEnV15QuantizedEmbeddingModel;
 import dev.langchain4j.model.input.Prompt;
 import dev.langchain4j.model.input.PromptTemplate;
-import dev.langchain4j.spi.data.document.splitter.DocumentSplitterFactory;
+import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingSearchResult;
 import dev.langchain4j.store.embedding.EmbeddingStore;
@@ -20,14 +22,14 @@ import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-
+import java.io.File;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-
 import static java.util.stream.Collectors.joining;
 
 @Slf4j
@@ -179,6 +181,7 @@ public class RAGImpl {
         }
 
         // Wait for all tasks to complete
+
         for (Future<?> future : futures) {
             try {
                 future.get();
@@ -193,6 +196,114 @@ public class RAGImpl {
         // Combine the responses into a single string
         return String.join("\n", responses);
     }
+
+
+
+    public void cleanAndStoreData(InputStream inputStream) {
+        try {
+            // Parse PDF document
+            DocumentParser parser = new ApachePdfBoxDocumentParser();
+            Document document = parser.parse(inputStream);
+            String data = document.text(); // Ensure correct method for text extraction
+
+            // Split into segments
+            Document finalDocument = new Document(data);
+            DocumentSplitter documentSplitter=new DocumentByParagraphSplitter(2000,2);
+//            DocumentSplitter splitter = new DocumentByRegexSplitter("CHAPTER", "\n", 3000, 2);
+            List<TextSegment> segments = documentSplitter.split(finalDocument);
+
+            // Embed segments
+            EmbeddingModel embeddingModel = new BgeSmallEnV15QuantizedEmbeddingModel();
+            List<Embedding> embeddings = embeddingModel.embedAll(segments).content();
+
+
+            // Store embeddings
+            InMemoryEmbeddingStore<TextSegment> embeddingStore = new InMemoryEmbeddingStore<>();
+            embeddingStore.addAll(embeddings, segments);
+
+            // Serialize to file
+            String filePath ="file/embedding.store";
+            File directory = new File(filePath).getParentFile();
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            embeddingStore.serializeToFile(filePath);
+
+        } catch (Exception e) {
+            log.error("Error processing document", e);
+            throw new RuntimeException("Failed to process document", e);
+        }
+    }
+
+
+    public String lawyerRag(String userEmail,String prompt) throws DatasetNotAvailable{
+
+        Assistant assistant = AiServices.builder(Assistant.class)
+                .chatLanguageModel(configLangChain.chatClient())
+                .chatMemoryProvider(memoryId -> MessageWindowChatMemory.withMaxMessages(10))
+                .build();
+
+        InMemoryEmbeddingStore<TextSegment> deserializedStore;
+        try{
+            String filePath = "file/embedding.store";
+            deserializedStore = InMemoryEmbeddingStore.fromFile(filePath);
+        } catch (RuntimeException e) {
+            throw new DatasetNotAvailable(e.getMessage());
+        }
+
+
+    // Embed the question
+    String information = null;
+
+    //cleaning user question
+    List<String> questions = configLangChain.simplifyQuestions(prompt);
+    EmbeddingModel embeddingModel = new BgeSmallEnV15QuantizedEmbeddingModel();
+    for (int i = 0; i < questions.size(); i++) {
+        //embedding an AI question
+        Embedding questionEmbedding = embeddingModel.embed(questions.get(i)).content();
+        // Find relevant embeddings in embedding store by semantic similarity
+        // You can play with parameters below to find a sweet spot for your specific use case
+        int maxResults = 2;
+        double minScore = 0.2;
+        //setting perameters for sementic search
+        EmbeddingSearchRequest embeddingSearchRequest = EmbeddingSearchRequest.builder()
+                .queryEmbedding(questionEmbedding)
+                .maxResults(maxResults)
+                .minScore(minScore)
+                .build();
+        EmbeddingSearchResult<TextSegment> relevantEmbeddings = deserializedStore.search(embeddingSearchRequest);
+
+        information += relevantEmbeddings.matches().stream()
+                .map(match -> match.embedded().text())
+                .collect(joining("\n\n"));
+    }
+
+    // Create a prompt for the model that includes question and relevant embeddings
+    PromptTemplate promptTemplate = PromptTemplate.from(
+            "You are a lawyer, the given data is from Law of Bangladesh, answer the given questions question as a lawyer be polite and Specific:\n"
+                    + "\n"
+                    + "Questions:\n"
+                    + "{{question}}\n"
+                    + "\n"
+                    + "Base your answer on the following Data from Law of Bangladesh :\n"
+                    + "{{information}}");
+
+    log.info("Retrive Data: "+information);
+    Map<String, Object> variables = new HashMap<>();
+    variables.put("question", prompt);
+    variables.put("information", information);
+    Prompt Modelprompt = promptTemplate.apply(variables);
+
+    AiMessage aiMessage = configLangChain.chatClient().generate(Modelprompt.toUserMessage()).content();
+    String aiMessage1=assistant.chat(userEmail,Modelprompt.toUserMessage());
+    String response = aiMessage.text();
+
+    return aiMessage1;
+}
+
+
+
+
 }
 
 

@@ -1,28 +1,16 @@
 package com.example.SpringAI.Services.AIServices;
-
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
-import dev.langchain4j.model.huggingface.HuggingFaceEmbeddingModel;
-import dev.langchain4j.model.mistralai.MistralAiStreamingChatModel;
-import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.internal.bytebuddy.utility.dispatcher.JavaDispatcher;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
-import java.time.Duration;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.time.Duration.ofSeconds;
 
 @Configuration
 @Slf4j
@@ -51,14 +39,14 @@ public class ConfigLangChain {
         return  model;
     }
 
-    @Bean
-    public EmbeddingModel embeddingModel() {
-        EmbeddingModel embeddingModel = HuggingFaceEmbeddingModel.builder()
-                .accessToken(EMBD_API_KEY)
-                .modelId(EMBEDDING_MODEL_NAME)
-                .build();
-        return  embeddingModel;
-    }
+//    @Bean
+//    public EmbeddingModel embeddingModel() {
+//        EmbeddingModel embeddingModel = HuggingFaceEmbeddingModel.builder()
+//                .accessToken(EMBD_API_KEY)
+//                .modelId(EMBEDDING_MODEL_NAME)
+//                .build();
+//        return  embeddingModel;
+//    }
 
 
 
