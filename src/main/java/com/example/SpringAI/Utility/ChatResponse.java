@@ -4,15 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-
-@Component
-public class APIResponse{
-    private String massage;
-    private boolean success;
+@AllArgsConstructor
+public class ChatResponse {
+    String message;
+    String userName;
+    HttpStatus ResponseStatus;
 }

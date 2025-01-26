@@ -186,7 +186,7 @@
 <script>
     async function fetchAndRenderSlides() {
         const userId = document.getElementById("userId").value;
-        const response = await fetch(`https://aibuddy.digital/api/v1/slide/get/all/user/${userId}`);
+        const response = await fetch(`http://localhost:8080/api/v1/slide/get/all/user/${userId}`);
         const data = await response.json();
 
         const slidesContainer = document.getElementById('slides-container');
@@ -229,7 +229,7 @@
         const confirmation = confirm('Are you sure you want to delete this slide?');
         if (confirmation) {
             try {
-                const response = await fetch(`https://aibuddy.digital/api/v1/slide/delete/${slideId}`, { method: 'DELETE' });
+                const response = await fetch(`http://localhost:8080/api/v1/slide/delete/${slideId}`, { method: 'DELETE' });
                 if (response.ok) {
                     alert('Slide deleted successfully.');
                     await location.reload();// Refresh the slides after deletion
@@ -285,15 +285,15 @@
     }
 
     async function generateShortQuestions(slideID, numQuestions) {
-        await fetch(`https://aibuddy.digital/api/v1/slide/generate/sq/${slideID}/${numQuestions}`);
+        await fetch(`http://localhost:8080/api/v1/slide/generate/sq/${slideID}/${numQuestions}`);
     }
 
     async function generateMCQs(slideID, numMCQs) {
-        await fetch(`https://aibuddy.digital/api/v1/slide/generate/mcq/${slideID}/${numMCQs}`);
+        await fetch(`http://localhost:8080/api/v1/slide/generate/mcq/${slideID}/${numMCQs}`);
     }
 
     async function generateSummary(slideID) {
-        await fetch(`https://aibuddy.digital/api/v1/slide/generate/summary/${slideID}`);
+        await fetch(`http://localhost:8080/api/v1/slide/generate/summary/${slideID}`);
     }
 
 
@@ -329,70 +329,6 @@
 
         return section;
     }
-
-    // function createReadMoreSection(label, content) {
-    //     const section = document.createElement('div');
-    //     section.classList.add('section');
-    //
-    //     const labelElem = document.createElement('h4');
-    //     labelElem.textContent = label;
-    //     section.appendChild(labelElem);
-    //
-    //     if (content) {
-    //         if (label === 'Questions') {
-    //             // Split content into individual questions and answers
-    //             const items = content.match(/\d\.\sQ:.*?A:.*?(?=(\d\.|$))/gs);
-    //
-    //             const listContainer = document.createElement('div');
-    //             items.forEach((item) => {
-    //                 const questionAnswer = document.createElement('p');
-    //                 questionAnswer.textContent = item.trim();
-    //                 listContainer.appendChild(questionAnswer);
-    //             });
-    //             section.appendChild(listContainer);
-    //         } else if (label === 'MCQs') {
-    //             // Split content into individual MCQs
-    //             const items = content.match(/\d\.\s.*?Correct answer:.*?(?=(\d\.|$))/gs);
-    //
-    //             const listContainer = document.createElement('div');
-    //             items.forEach((item) => {
-    //                 const mcq = document.createElement('p');
-    //                 mcq.textContent = item.trim();
-    //                 listContainer.appendChild(mcq);
-    //             });
-    //             section.appendChild(listContainer);
-    //         } else {
-    //             // Handle other content types (e.g., Summary, Slide Content)
-    //             const contentElem = document.createElement('p');
-    //             contentElem.textContent = content.slice(0, 100);
-    //             section.appendChild(contentElem);
-    //
-    //             if (content.length > 100) {
-    //                 const toggleLink = document.createElement('span');
-    //                 toggleLink.textContent = ' Read More';
-    //                 toggleLink.classList.add('read-more');
-    //
-    //                 toggleLink.onclick = () => {
-    //                     if (toggleLink.textContent === ' Read More') {
-    //                         contentElem.textContent = content;
-    //                         toggleLink.textContent = ' Read Less';
-    //                     } else {
-    //                         contentElem.textContent = content.slice(0, 100);
-    //                         toggleLink.textContent = ' Read More';
-    //                     }
-    //                 };
-    //
-    //                 section.appendChild(toggleLink);
-    //             }
-    //         }
-    //     } else {
-    //         const placeholder = document.createElement('p');
-    //         placeholder.textContent = 'Click generate to generate the content';
-    //         section.appendChild(placeholder);
-    //     }
-    //
-    //     return section;
-    // }
 
     fetchAndRenderSlides();
 </script>
