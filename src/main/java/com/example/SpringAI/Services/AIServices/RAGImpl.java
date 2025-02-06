@@ -285,7 +285,7 @@ public class RAGImpl {
                         + "Questions:\n"
                         + "{{question}}\n"
                         + "\n"
-                        + "Base your answer on the following Data from Law of Bangladesh :\n"
+                        + "Here is the given Data from Law of Bangladesh :\n"
                         + "{{information}}");
 
         log.info("Retrive Data: "+information);
