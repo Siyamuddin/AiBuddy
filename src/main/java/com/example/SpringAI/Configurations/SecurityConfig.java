@@ -37,16 +37,14 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, Jackson2ObjectMapperBuilderCustomizer customizer) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/","/auth/login/**","/auth/register/**","/v3/api-docs/**",
+                        .requestMatchers("/auth/login/**","/auth/register/**","/v3/api-docs/**",
                                 "/v2/api-docs/**",
                                 "/swagger-resources/**",
                                 "/swagger-ui/**",
                                 "/webjars/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/login",
-                                "/favicon_io",
-                                "/static/aibuddy.png") // Match the root URL correctly
+                                "/login") // Match the root URL correctly
                         .permitAll() // Allow access to the root URL and public URLs without authentication
                         .anyRequest()
                         .authenticated()
