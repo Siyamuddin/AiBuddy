@@ -280,7 +280,7 @@ public class RAGImpl {
 
         // Create a prompt for the model that includes question and relevant embeddings
         PromptTemplate promptTemplate = PromptTemplate.from(
-                "You are a lawyer, the given data is from Law of Bangladesh, answer the given questions question as a lawyer be polite and Specific:\n"
+                "You are a lawyer, the given data is from Law of Bangladesh, answer the given questions question as a lawyer be polite and Specific. If the given data and the questions are irrelevant still try to provide the answer accurately and genuinely.\n"
                         + "\n"
                         + "Questions:\n"
                         + "{{question}}\n"
@@ -294,9 +294,9 @@ public class RAGImpl {
         variables.put("information", information);
         Prompt Modelprompt = promptTemplate.apply(variables);
 
-        AiMessage aiMessage = configLangChain.chatClient().generate(Modelprompt.toUserMessage()).content();
+//        AiMessage aiMessage = configLangChain.chatClient().generate(Modelprompt.toUserMessage()).content();
         String aiMessage1=assistant.chat(userEmail,Modelprompt.toUserMessage());
-        String response = aiMessage.text();
+//        String response = aiMessage.text();
 
         return aiMessage1;
     }
