@@ -37,7 +37,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, Jackson2ObjectMapperBuilderCustomizer customizer) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login/**","/auth/register/**","/v3/api-docs/**",
+                        .requestMatchers("/**","/auth/login/**","/auth/register/**","/v3/api-docs/**",
                                 "/v2/api-docs/**",
                                 "/swagger-resources/**",
                                 "/swagger-ui/**",
