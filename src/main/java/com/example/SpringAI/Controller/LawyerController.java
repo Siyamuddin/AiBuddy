@@ -49,6 +49,12 @@ public class LawyerController {
         ChatResponse resp=lawyerServices.chatLawyer(chatRequest);
         return new ResponseEntity<>(resp,HttpStatus.OK);
     }
+    @GetMapping("/chat/{userid}/{message}")
+    public ResponseEntity<ChatResponse> chatLawyer2(@PathVariable Long userid, @PathVariable String message) {
+        ChatRequest chatRequest=new ChatRequest(userid,message);
+        ChatResponse resp=lawyerServices.chatLawyer(chatRequest);
+        return new ResponseEntity<>(resp,HttpStatus.OK);
+    }
 
     @DeleteMapping("/delete/dataset/{userid}")
     public ResponseEntity<APIResponse> deleteDataset(@PathVariable Long userid) throws IOException {
