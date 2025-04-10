@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 
 @Component
-public class APIResponse {
+public class APIResponse{
     private String massage;
     private boolean success;
 }
