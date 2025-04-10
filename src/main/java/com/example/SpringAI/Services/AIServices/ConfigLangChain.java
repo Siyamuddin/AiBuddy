@@ -18,35 +18,22 @@ public class ConfigLangChain {
 
     @Value("${ai.model.name}")
     private String MODEL_NAME;
-    @Value("${ai.model.name.embeddig}")
-    private String EMBEDDING_MODEL_NAME;
     @Value("${ai.base.url}")
     private String Base_URL;
     @Value("${ai.api.key}")
     private String API_KEY;
-    @Value("${embd.api.key}")
-    private String EMBD_API_KEY;
 
     @Bean
     public ChatLanguageModel chatClient(){
-        ChatLanguageModel model= OpenAiChatModel.builder()
+        return  OpenAiChatModel.builder()
                 .baseUrl(Base_URL)
                 .apiKey(API_KEY)
                 .modelName(MODEL_NAME)
                 .temperature(0.0)
                 .maxTokens(1024)
                 .build();
-        return  model;
-    }
 
-//    @Bean
-//    public EmbeddingModel embeddingModel() {
-//        EmbeddingModel embeddingModel = HuggingFaceEmbeddingModel.builder()
-//                .accessToken(EMBD_API_KEY)
-//                .modelId(EMBEDDING_MODEL_NAME)
-//                .build();
-//        return  embeddingModel;
-//    }
+    }
 
 
 
@@ -72,8 +59,8 @@ public class ConfigLangChain {
                 "Provide these alternative questions separated by newlines, Original question:"+userQuerry+"?";
         String response=chatClient().generate(prompt);
 
-        List<String> ls=splitQuestions(response);
-        return ls;
+        return splitQuestions(response);
+
     }
 
 }

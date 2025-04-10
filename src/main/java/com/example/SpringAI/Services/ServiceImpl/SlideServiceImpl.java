@@ -179,7 +179,7 @@ public class SlideServiceImpl implements SlideServices {
     @Override
     public String generateShortQuestions(Long slideId, String numberOfQuestions) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
-        String questions = rag.generateRAGResponse(slide.getSlideContent(),"Generate "+ numberOfQuestions+ " possible short questions and answers from this lecture");
+        String questions = rag.generateRAGResponse(slide.getSlideContent(),"Generate "+ numberOfQuestions+ " pieces of possible short questions and answers from this lecture");
         slide.setGeneratedQuestions(questions);
         slideRepo.save(slide);
 

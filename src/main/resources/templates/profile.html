@@ -169,6 +169,11 @@
       <button id="editButton">Edit</button>
       <button id="delete">Delete</button>
       <input type="hidden" id="userId" th:value="${user.getId()}">
+      <input type="hidden" id="deleteUserURL" th:value="${deleteUserURL}">
+      <input type="hidden" id="updateUserURL" th:value="${updateUserURL}">
+      <input type="hidden" id="homePage" th:value="${homePage}">
+      <input type="hidden" id="deleteRelocateURL" th:value="${deleteRelocateURL}">
+
       <button id="updateButton" class="hidden">Update</button>
 
     </div>
@@ -242,11 +247,13 @@
 
   deleteButton.addEventListener("click", async () => {
     const userId = document.getElementById("userId").value; // Replace with user ID logic
+    const deleteUserURL=document.getElementById("deleteUserURL").value;
+
     const confirmDeletion = confirm("Are you sure you want to delete this account?");
 
     if (confirmDeletion) {
       try {
-        const response = await fetch(`https://aibuddy.digital/api/v1/user/delete/${userId}`, {
+        const response = await fetch(`${deleteUserURL}/${userId}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -254,7 +261,9 @@
         });
         if (response.ok) {
           alert("User deleted successfully.");
-          window.location.href = "https://aibuddy.digital/login";
+          window.location.href = 'http://localhost:8080/login';
+          const deleteRelocateURL=document.getElementById("deleteRelocateURL").value;
+          window.redirectUrl=deleteRelocateURL;
         } else {
           alert("Couldn't delete the user.");
         }
@@ -276,12 +285,14 @@
       university: document.getElementById("universityInput").value,
       department: document.getElementById("departmentInput").value,
       country: document.getElementById("countryInput").value,
+
     };
 
     const userId =document.getElementById("userId").value;/* Replace with user ID logic */;
+    const updateUserURL=document.getElementById("updateUserURL").value;
 
     try {
-      const response = await fetch(`https://aibuddy.digital/api/v1/user/update/${userId}`, {
+      const response = await fetch(`${updateUserURL}/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
