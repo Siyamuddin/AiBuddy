@@ -12,13 +12,13 @@ The system enables students to upload lecture slides in PDF format, query inform
 
 - **Programming Language**: Java
 - **Framework**: Spring Boot
-- **Database**: MySQL
-- **Security**: JWT (JSON Web Tokens) for secure login and logout functionality
-- **AI Model**: Ollama (Llama-3.2) open-source model
+- **Database**: MySQL and small vector DB
+- **Security**: Oauth2 for secure login and logout functionality
+- **AI Model**: Ollama (Llama-3.2 & mixbreed for embeddings) open-source model
 - **Libraries**:
-  - Apache PDFBox for PDF handling
+  - Apache PDFBox for PDF handling PDFs
   - Langchain4j (Java library for RAG operations)
-- **User Interface**: Swagger UI for API documentation and exploration
+- **User Interface**: Thymeleaf and Swagger UI for API documentation and exploration
 
 ## 🌟 Features
 
@@ -52,9 +52,9 @@ The system enables students to upload lecture slides in PDF format, query inform
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Java Development Kit (JDK) 11 or later
+- Java Development Kit (JDK) 17 or later
 - MySQL
-- Maven or Gradle for dependency management
+- Maven for dependency management
 
 ### Installation
 
@@ -80,6 +80,12 @@ The system enables students to upload lecture slides in PDF format, query inform
 
 5. **Access Swagger UI**:
    Navigate to `http://localhost:8080/swagger-ui.html` to explore the API endpoints.
+6. **Pull the Image from dockerHub**:
+   ```bash
+   docker pull uddin17/ai_buddy:latest
+   docker pull mysql:latest
+   ```
+   
 
 ## 🤝 Contributions
 
