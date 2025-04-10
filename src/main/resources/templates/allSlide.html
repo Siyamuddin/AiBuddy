@@ -182,11 +182,21 @@
 </div>
 <div id="slides-container"></div>
 <input type="hidden" id="userId" th:value="${user.getId()}">
+<input type="hidden" id="generateSummaryURL" th:value="${genrateSummaryURL}">
+<input type="hidden" id="generateMCQURL" th:value="${generateMCQURL}">
+<input type="hidden" id="generateShortQuestionURL" th:value="${generateShortQuestionURL}">
+<input type="hidden" id="deleteSlideURL" th:value="${deleteSlideURL}">
+<input type="hidden" id="getAllUserURL" th:value="${getAllUserURL}">
+
+
 
 <script>
     async function fetchAndRenderSlides() {
         const userId = document.getElementById("userId").value;
-        const response = await fetch(`http://localhost:8080/api/v1/slide/get/all/user/${userId}`);
+        const deleteSlideURL=document.getElementById("deleteSlideURL").value;
+        const getAllUserURL=document.getElementById("getAllUserURL").value;
+
+        const response = await fetch(`${getAllUserURL}/${userId}`);
         const data = await response.json();
 
         const slidesContainer = document.getElementById('slides-container');
@@ -226,10 +236,12 @@
     }
 
     async function handleDeleteSlide(slideId) {
+        const deleteSlideURL=document.getElementById("deleteSlideURL").value;
+
         const confirmation = confirm('Are you sure you want to delete this slide?');
         if (confirmation) {
             try {
-                const response = await fetch(`http://localhost:8080/api/v1/slide/delete/${slideId}`, { method: 'DELETE' });
+                const response = await fetch(`${deleteSlideURL}/${slideId}`, { method: 'DELETE' });
                 if (response.ok) {
                     alert('Slide deleted successfully.');
                     await location.reload();// Refresh the slides after deletion
@@ -267,6 +279,7 @@
     function createGenerateSectionSummary(label, content, generateFunc) {
         const section = document.createElement('div');
         section.classList.add('section');
+        const generateShortQuestionURL=document.getElementById("generateShortQuestionURL").value;
 
         const contentContainer = createReadMoreSection(label, content);
         section.appendChild(contentContainer);
@@ -285,15 +298,20 @@
     }
 
     async function generateShortQuestions(slideID, numQuestions) {
-        await fetch(`http://localhost:8080/api/v1/slide/generate/sq/${slideID}/${numQuestions}`);
+        const generateShortQuestionURL=document.getElementById("generateShortQuestionURL").value;
+
+        await fetch(`${generateShortQuestionURL}/${slideID}/${numQuestions}`);
     }
 
     async function generateMCQs(slideID, numMCQs) {
-        await fetch(`http://localhost:8080/api/v1/slide/generate/mcq/${slideID}/${numMCQs}`);
+        const generateMCQURL=document.getElementById("generateMCQURL").value;
+
+        await fetch(`${generateMCQURL}/${slideID}/${numMCQs}`);
     }
 
     async function generateSummary(slideID) {
-        await fetch(`http://localhost:8080/api/v1/slide/generate/summary/${slideID}`);
+        const generateSummaryURL=document.getElementById("generateSummaryURL").value;
+        await fetch(`${generateSummaryURL}/${slideID}`);
     }
 
 
@@ -329,6 +347,70 @@
 
         return section;
     }
+
+    // function createReadMoreSection(label, content) {
+    //     const section = document.createElement('div');
+    //     section.classList.add('section');
+    //
+    //     const labelElem = document.createElement('h4');
+    //     labelElem.textContent = label;
+    //     section.appendChild(labelElem);
+    //
+    //     if (content) {
+    //         if (label === 'Questions') {
+    //             // Split content into individual questions and answers
+    //             const items = content.match(/\d\.\sQ:.*?A:.*?(?=(\d\.|$))/gs);
+    //
+    //             const listContainer = document.createElement('div');
+    //             items.forEach((item) => {
+    //                 const questionAnswer = document.createElement('p');
+    //                 questionAnswer.textContent = item.trim();
+    //                 listContainer.appendChild(questionAnswer);
+    //             });
+    //             section.appendChild(listContainer);
+    //         } else if (label === 'MCQs') {
+    //             // Split content into individual MCQs
+    //             const items = content.match(/\d\.\s.*?Correct answer:.*?(?=(\d\.|$))/gs);
+    //
+    //             const listContainer = document.createElement('div');
+    //             items.forEach((item) => {
+    //                 const mcq = document.createElement('p');
+    //                 mcq.textContent = item.trim();
+    //                 listContainer.appendChild(mcq);
+    //             });
+    //             section.appendChild(listContainer);
+    //         } else {
+    //             // Handle other content types (e.g., Summary, Slide Content)
+    //             const contentElem = document.createElement('p');
+    //             contentElem.textContent = content.slice(0, 100);
+    //             section.appendChild(contentElem);
+    //
+    //             if (content.length > 100) {
+    //                 const toggleLink = document.createElement('span');
+    //                 toggleLink.textContent = ' Read More';
+    //                 toggleLink.classList.add('read-more');
+    //
+    //                 toggleLink.onclick = () => {
+    //                     if (toggleLink.textContent === ' Read More') {
+    //                         contentElem.textContent = content;
+    //                         toggleLink.textContent = ' Read Less';
+    //                     } else {
+    //                         contentElem.textContent = content.slice(0, 100);
+    //                         toggleLink.textContent = ' Read More';
+    //                     }
+    //                 };
+    //
+    //                 section.appendChild(toggleLink);
+    //             }
+    //         }
+    //     } else {
+    //         const placeholder = document.createElement('p');
+    //         placeholder.textContent = 'Click generate to generate the content';
+    //         section.appendChild(placeholder);
+    //     }
+    //
+    //     return section;
+    // }
 
     fetchAndRenderSlides();
 </script>

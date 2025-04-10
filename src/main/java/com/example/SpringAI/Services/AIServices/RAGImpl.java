@@ -252,60 +252,59 @@ public class RAGImpl {
         }
 
 
-    // Embed the question
-    String information = null;
+        // Embed the question
+        String information = null;
 
-    //cleaning user question
-    List<String> questions = configLangChain.simplifyQuestions(prompt);
-    EmbeddingModel embeddingModel = new BgeSmallEnV15QuantizedEmbeddingModel();
-    for (int i = 0; i < questions.size(); i++) {
-        //embedding an AI question
-        Embedding questionEmbedding = embeddingModel.embed(questions.get(i)).content();
-        // Find relevant embeddings in embedding store by semantic similarity
-        // You can play with parameters below to find a sweet spot for your specific use case
-        int maxResults = 2;
-        double minScore = 0.2;
-        //setting perameters for sementic search
-        EmbeddingSearchRequest embeddingSearchRequest = EmbeddingSearchRequest.builder()
-                .queryEmbedding(questionEmbedding)
-                .maxResults(maxResults)
-                .minScore(minScore)
-                .build();
-        EmbeddingSearchResult<TextSegment> relevantEmbeddings = deserializedStore.search(embeddingSearchRequest);
+        //cleaning user question
+        List<String> questions = configLangChain.simplifyQuestions(prompt);
+        EmbeddingModel embeddingModel = new BgeSmallEnV15QuantizedEmbeddingModel();
+        for (int i = 0; i < questions.size(); i++) {
+            //embedding an AI question
+            Embedding questionEmbedding = embeddingModel.embed(questions.get(i)).content();
+            // Find relevant embeddings in embedding store by semantic similarity
+            // You can play with parameters below to find a sweet spot for your specific use case
+            int maxResults = 2;
+            double minScore = 0.2;
+            //setting perameters for sementic search
+            EmbeddingSearchRequest embeddingSearchRequest = EmbeddingSearchRequest.builder()
+                    .queryEmbedding(questionEmbedding)
+                    .maxResults(maxResults)
+                    .minScore(minScore)
+                    .build();
+            EmbeddingSearchResult<TextSegment> relevantEmbeddings = deserializedStore.search(embeddingSearchRequest);
 
-        information += relevantEmbeddings.matches().stream()
-                .map(match -> match.embedded().text())
-                .collect(joining("\n\n"));
+            information += relevantEmbeddings.matches().stream()
+                    .map(match -> match.embedded().text())
+                    .collect(joining("\n\n"));
+        }
+
+        // Create a prompt for the model that includes question and relevant embeddings
+        PromptTemplate promptTemplate = PromptTemplate.from(
+                "You are a lawyer, the given data is from Law of Bangladesh, answer the given questions question as a lawyer be polite and Specific. If the given data and the questions are irrelevant still try to provide the answer accurately and genuinely.\n"
+                        + "\n"
+                        + "Questions:\n"
+                        + "{{question}}\n"
+                        + "\n"
+                        + "Here is the given Data from Law of Bangladesh :\n"
+                        + "{{information}}");
+
+        log.info("Retrive Data: "+information);
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("question", prompt);
+        variables.put("information", information);
+        Prompt Modelprompt = promptTemplate.apply(variables);
+
+//        AiMessage aiMessage = configLangChain.chatClient().generate(Modelprompt.toUserMessage()).content();
+        String aiMessage1=assistant.chat(userEmail,Modelprompt.toUserMessage());
+//        String response = aiMessage.text();
+
+        return aiMessage1;
     }
 
-    // Create a prompt for the model that includes question and relevant embeddings
-    PromptTemplate promptTemplate = PromptTemplate.from(
-            "You are a lawyer, the given data is from Law of Bangladesh, answer the given questions question as a lawyer be polite and Specific:\n"
-                    + "\n"
-                    + "Questions:\n"
-                    + "{{question}}\n"
-                    + "\n"
-                    + "Base your answer on the following Data from Law of Bangladesh :\n"
-                    + "{{information}}");
-
-    log.info("Retrive Data: "+information);
-    Map<String, Object> variables = new HashMap<>();
-    variables.put("question", prompt);
-    variables.put("information", information);
-    Prompt Modelprompt = promptTemplate.apply(variables);
-
-    AiMessage aiMessage = configLangChain.chatClient().generate(Modelprompt.toUserMessage()).content();
-    String aiMessage1=assistant.chat(userEmail,Modelprompt.toUserMessage());
-    String response = aiMessage.text();
-
-    return aiMessage1;
-}
-
 
 
 
 }
-
 
 
 

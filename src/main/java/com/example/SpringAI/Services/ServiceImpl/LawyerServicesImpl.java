@@ -1,5 +1,6 @@
 package com.example.SpringAI.Services.ServiceImpl;
 
+
 import com.example.SpringAI.Exceptions.ResourceNotFoundException;
 import com.example.SpringAI.Model.LocalUser;
 import com.example.SpringAI.Repository.LocalUserRepo;
@@ -44,8 +45,8 @@ public class LawyerServicesImpl implements LawyerServices {
     public void deleteDataset(Long userId) throws IOException {
         LocalUser localUser=localUserRepo.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","ID",userId));
 
-            Files.deleteIfExists(Paths.get("file/DATASET.pdf"));
-            Files.deleteIfExists(Paths.get("file/embedding.store"));
+        Files.deleteIfExists(Paths.get("file/DATASET.pdf"));
+        Files.deleteIfExists(Paths.get("file/embedding.store"));
 
 
     }

@@ -8,9 +8,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class DatasetNotAvailable extends RuntimeException{
-    private String message;
-    public DatasetNotAvailable(String massage) {
-        super(String.format(massage));
-      this.message=massage;
-    }
+  private String message;
+  public DatasetNotAvailable(String massage) {
+    super(String.format(massage));
+    this.message=massage;
+  }
 }

@@ -1,5 +1,6 @@
 package com.example.SpringAI.Controller;
 
+
 import com.example.SpringAI.Services.AIServices.RAGImpl;
 import com.example.SpringAI.Services.LawyerServices;
 import com.example.SpringAI.Services.ServiceImpl.FileService;
@@ -19,8 +20,10 @@ import java.io.InputStream;
 @RestController
 @RequestMapping("/api/v1/lawyer")
 public class LawyerController {
-    @Autowired
     private LawyerServices lawyerServices;
+    public LawyerController(LawyerServices lawyerServices) {
+        this.lawyerServices = lawyerServices;
+    }
     @Autowired
     private RAGImpl rag;
     @Autowired
@@ -43,6 +46,12 @@ public class LawyerController {
     @GetMapping("/chat")
     public ResponseEntity<ChatResponse> chatLawyer(@RequestBody ChatRequest chatRequest) {
 
+        ChatResponse resp=lawyerServices.chatLawyer(chatRequest);
+        return new ResponseEntity<>(resp,HttpStatus.OK);
+    }
+    @GetMapping("/chat/{userid}/{message}")
+    public ResponseEntity<ChatResponse> chatLawyer2(@PathVariable Long userid, @PathVariable String message) {
+        ChatRequest chatRequest=new ChatRequest(userid,message);
         ChatResponse resp=lawyerServices.chatLawyer(chatRequest);
         return new ResponseEntity<>(resp,HttpStatus.OK);
     }

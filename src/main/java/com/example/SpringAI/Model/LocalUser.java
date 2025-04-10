@@ -48,4 +48,7 @@ public class LocalUser {
     @OneToMany(mappedBy = "localUser",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
     private List<Slide> userSlides = new ArrayList<>();
 
+    @OneToMany(mappedBy = "localUser",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
+    private List<DataSet> dataSets = new ArrayList<>();
+
 }

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .chat-container {
+            width: 90%;
+            max-width: 600px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            height: 400px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message .content {
+            max-width: 70%;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message.user .content {
+            background-color: #007bff;
+            color: white;
+            border-radius: 10px 10px 0 10px;
+        }
+
+        .message.bot .content {
+            background-color: #f1f1f1;
+            color: #333;
+            border-radius: 10px 10px 10px 0;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background-color: #ffffff;
+            border-top: 1px solid #ddd;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 15px;
+            font-size: 14px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chat-input button:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 600px) {
+            .chat-container {
+                height: 90%;
+            }
+
+            .chat-messages {
+                height: calc(100% - 60px);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <input type="hidden" id="userId" th:value="${user.getId()}">
+    <div class="chat-header">AI Chatbot</div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+        <input type="text" id="userMessage" placeholder="Type your message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    const chatMessages = document.getElementById('chatMessages');
+
+    function createMessageElement(message, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'content';
+        contentDiv.textContent = message;
+
+        messageDiv.appendChild(contentDiv);
+        return messageDiv;
+    }
+
+    async function sendMessage() {
+        const userMessageInput = document.getElementById('userMessage');
+        const userMessage = userMessageInput.value.trim();
+
+        if (!userMessage) return;
+
+        // Display user message
+        const userMessageElement = createMessageElement(userMessage, true);
+        chatMessages.appendChild(userMessageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Clear input
+        userMessageInput.value = '';
+
+        // Call API
+        const userId =  document.getElementById("userId").value; // Replace with actual user ID if available
+        const apiUrl = `https://aibuddy.digital/api/v1/lawyer/chat/${userId}/${(userMessage)}`;
+
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+
+            if (data.responseStatus === 'OK') {
+                const botMessage = data.message || 'No response available';
+                const botMessageElement = createMessageElement(botMessage, false);
+                chatMessages.appendChild(botMessageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else {
+                throw new Error('Failed to get a valid response from the server.');
+            }
+        } catch (error) {
+            const errorMessageElement = createMessageElement('Error: Unable to fetch response from the server.', false);
+            chatMessages.appendChild(errorMessageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+</script>
+</body>
+</html>
