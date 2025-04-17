@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta name="description" content="Revolutionize learning with AiBuddy! Upload lecture slides, generate summaries, MCQs, and short-answer questions, and prepare for exams with AI-powered insights. Secure, efficient, and user-friendly.">
     <meta name="keywords" content="AI-powered study tools, class management, lecture slides processing, exam preparation, MCQ generation, short-answer questions, Java Spring Boot, JWT authentication, Llama AI, Langchain4j, educational technology">
@@ -13,169 +13,643 @@
     <meta name="robots" content="index, follow">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://media.licdn.com/dms/image/v2/D562DAQEroXIeXbbXZg/profile-treasury-image-shrink_800_800/profile-treasury-image-shrink_800_800/0/1733239015649?e=1733846400&v=beta&t=68nxhIzEshcUnfmMbwNhMPqIXslOSTBxfxcK--QlpKs">
-    <title>PDF Slide Upload</title>
+    <title>AiBuddy - Upload Lecture Slides</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #4895ef;
+            --primary-light: #81c784;
+            --secondary: #2196F3;
+            --accent: #FF5722;
+            --text-dark: #333;
+            --text-light: #f8f9fa;
+            --bg-light: #f8f9fa;
+            --bg-dark: #343a40;
+            --success: #28a745;
+            --danger: #dc3545;
+        }
+
         body {
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .container {
-            margin-top: 50px;
-        }
-
-        /* Spinner styles */
-        .spinner-container {
-            display: none;
+        .page-container {
+            flex: 1;
+            display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            padding: 2rem 1rem;
+        }
+
+        .upload-container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin-top: 0.5rem;
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: white;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .dropzone {
+            border: 2px dashed var(--primary-light);
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: rgba(76, 175, 80, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropzone:hover {
+            border-color: var(--primary);
+            background-color: rgba(76, 175, 80, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .dropzone.drag-over {
+            border-color: var(--primary);
+            background-color: rgba(76, 175, 80, 0.15);
+            transform: scale(1.02);
+        }
+
+        .dropzone i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .dropzone h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .dropzone p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .selected-file {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: rgba(76, 175, 80, 0.1);
+            border-radius: 8px;
+            align-items: center;
+        }
+
+        .selected-file i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-right: 1rem;
+        }
+
+        .selected-file-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .selected-file-size {
+            color: #666;
+            font-size: 0.9rem;
+            margin-left: 1rem;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .btn:hover::after {
+            animation: ripple 1s ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(76, 175, 80, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 5px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .status-container {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            border-left: 4px solid var(--success);
+        }
+
+        .status-error {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 4px solid var(--danger);
+        }
+
+        .status-container i {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .status-success i {
+            color: var(--success);
+        }
+
+        .status-error i {
+            color: var(--danger);
+        }
+
+        .slides-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .content {
+                padding: 1.5rem;
+            }
+
+            .btn-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Animation for the file icon */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .dropzone i {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Pulse animation for the upload button */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+
+        .btn-primary {
+            animation: pulse 2s infinite;
+        }
+
+        /* Spinner animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .spinner {
-            width: 3rem;
-            height: 3rem;
-            border: 0.5rem solid #f3f3f3;
-            border-top: 0.5rem solid #4CAF50;
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            border: 0.25rem solid rgba(76, 175, 80, 0.3);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 1rem;
         }
-
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Upload Slide Button */
-        .upload-slide-button {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .upload-slide-button {
-            background: #4CAF50;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background 0.3s ease;
-        }
-
-        .upload-slide-button:hover {
-            background: #45a049;
-        }
-        #gotoSlide {
-            text-align: center;
-            margin-top: 20px;
-            margin-left: 10px;
-        }
-        #gotoSlide:hover {
-            background: #45a049;
-        }
-        #gotoSlide{
-            background: #4CAF50;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-radius: 5px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background 0.3s ease;
-        }
-
     </style>
 </head>
 <body>
-<div class="container">
-    <h2 class="text-center">Upload PDF Slide</h2>
-    <form id="uploadForm" class="card p-4">
-        <div class="mb-3">
-            <label for="pdfFile" class="form-label">Choose PDF Slide</label>
-            <input type="file" class="form-control" id="pdfFile" name="pdfFile" accept=".pdf" required>
-            <input type="hidden" id="userId" th:value="${user.getId()}">
-            <input type="hidden" id="slideUploadURL" th:value="${slideUploadURL}">
+<div class="page-container">
+    <div class="upload-container">
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> AiBuddy Slide Uploader</h1>
+            <p>Upload your lecture slides to generate AI-powered summaries and questions</p>
         </div>
-        <button type="submit" class="upload-slide-button">Upload Slide</button>
-    </form>
-    <div id="spinner-Container" class="spinner-container" style="display: none;">Loading...</div>
-    <div>
-        <a th:href="@{/view/get/all/slide}">
-            <button type="submit" id="gotoSlide">Goto Slides(<span th:text="${size}"></span>)</button>
-        </a>
-    </div>
 
-    <!-- Spinner -->
-    <div id="spinnerContainer" class="spinner-container">
-        <div class="spinner"></div>
-        <p>Uploading...</p>
+        <div class="content">
+            <form id="uploadForm">
+                <div id="dropzone" class="dropzone">
+                    <i class="fas fa-file-pdf"></i>
+                    <h3>Drag & Drop Your PDF Slides</h3>
+                    <p>or click to browse your files</p>
+                    <span class="btn btn-sm btn-outline-primary">Select File</span>
+                    <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" class="file-input" required>
+                    <input type="hidden" id="userId" th:value="${user.getId()}">
+                    <input type="hidden" id="slideUploadURL" th:value="${slideUploadURL}">
+                </div>
+
+                <div id="selectedFile" class="selected-file">
+                    <i class="fas fa-file-pdf"></i>
+                    <div class="selected-file-name"></div>
+                    <div class="selected-file-size"></div>
+                    <button type="button" id="removeFile" class="btn btn-sm btn-outline-danger ms-2">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" id="uploadButton" class="btn btn-primary">
+                        <i class="fas fa-cloud-upload-alt me-2"></i> Upload Slide
+                    </button>
+                    <a th:href="@{/view/get/all/slide}" class="btn btn-secondary">
+                        <i class="fas fa-list-alt me-2"></i> View All Slides
+                        <span class="slides-count" th:text="${size}"></span>
+                    </a>
+                </div>
+
+                <div id="progressContainer" class="progress-container">
+                    <div class="progress">
+                        <div id="progressBar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progressStatus">Preparing upload...</span>
+                        <span id="progressPercentage">0%</span>
+                    </div>
+                </div>
+
+                <div id="statusSuccess" class="status-container status-success">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <h5 class="mb-0">Upload Successful!</h5>
+                            <p class="mb-0">Your slides have been uploaded and are being processed.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="statusError" class="status-container status-error">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div>
+                            <h5 class="mb-0">Upload Failed</h5>
+                            <p id="errorMessage" class="mb-0">There was an error uploading your file.</p>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
-    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('pdfFile');
+        const selectedFile = document.getElementById('selectedFile');
+        const selectedFileName = document.querySelector('.selected-file-name');
+        const selectedFileSize = document.querySelector('.selected-file-size');
+        const removeFileBtn = document.getElementById('removeFile');
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadButton = document.getElementById('uploadButton');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressStatus = document.getElementById('progressStatus');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const statusSuccess = document.getElementById('statusSuccess');
+        const statusError = document.getElementById('statusError');
+        const errorMessage = document.getElementById('errorMessage');
 
-        // Show the spinner
-        const spinnerContainer = document.getElementById('spinnerContainer');
-        spinnerContainer.style.display = 'flex';
-
-        const pdfFile = document.getElementById('pdfFile').files[0];
-
-        // File size validation (10 MB = 10 * 1024 * 1024 bytes)
-        if (pdfFile.size > 10 * 1024 * 1024) {
-            spinnerContainer.style.display = 'none';
-            alert('Error: File size exceeds the 10 MB limit.');
-            return;
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        const formData = new FormData();
-        const userId = document.getElementById("userId").value;
-        const slideUploadURL=document.getElementById("slideUploadURL").value;
+        // Handle file selection
+        function handleFileSelect(file) {
+            if (file) {
+                // Check file type
+                if (file.type !== 'application/pdf') {
+                    showError('Please select a PDF file.');
+                    return;
+                }
 
-        formData.append('file', pdfFile);
+                // Check file size (10MB limit)
+                if (file.size > 10 * 1024 * 1024) {
+                    showError('File size exceeds the 10 MB limit.');
+                    return;
+                }
 
-        try {
-            const uploadResponse = await fetch(`${slideUploadURL}/${userId}`, {
-                method: 'POST',
-                body: formData
-            });
+                // Display selected file info
+                selectedFileName.textContent = file.name;
+                selectedFileSize.textContent = formatFileSize(file.size);
+                selectedFile.style.display = 'flex';
 
-            if (!uploadResponse.ok) throw new Error('Upload failed');
-
-            // Hide the spinner
-            spinnerContainer.style.display = 'none';
-
-            // Display success message
-            alert('Upload successful!');
-
-            // Reload the page
-            window.location.reload();
-        } catch (error) {
-            // Hide the spinner
-            spinnerContainer.style.display = 'none';
-
-            // Display error message
-            alert(`Error: ${error.message}`);
+                // Hide any previous status messages
+                statusSuccess.style.display = 'none';
+                statusError.style.display = 'none';
+            }
         }
+
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            statusError.style.display = 'block';
+            progressContainer.style.display = 'none';
+
+            // Clear file input
+            fileInput.value = '';
+            selectedFile.style.display = 'none';
+        }
+
+        // File input change event
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                handleFileSelect(this.files[0]);
+            }
+        });
+
+        // Remove file button click
+        removeFileBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            fileInput.value = '';
+            selectedFile.style.display = 'none';
+            statusSuccess.style.display = 'none';
+            statusError.style.display = 'none';
+        });
+
+        // Drag and drop events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, function() {
+                this.classList.add('drag-over');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, function() {
+                this.classList.remove('drag-over');
+            }, false);
+        });
+
+        dropzone.addEventListener('drop', function(e) {
+            const file = e.dataTransfer.files[0];
+            fileInput.files = e.dataTransfer.files;
+            handleFileSelect(file);
+        }, false);
+
+        // Form submission
+        uploadForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const file = fileInput.files[0];
+            if (!file) {
+                showError('Please select a file to upload.');
+                return;
+            }
+
+            // Show progress container
+            progressContainer.style.display = 'block';
+            statusSuccess.style.display = 'none';
+            statusError.style.display = 'none';
+
+            // Disable upload button
+            uploadButton.disabled = true;
+            uploadButton.innerHTML = '<div class="spinner"></div> Uploading...';
+
+            const formData = new FormData();
+            const userId = document.getElementById("userId").value;
+            const slideUploadURL = document.getElementById("slideUploadURL").value;
+
+            formData.append('file', file);
+
+            try {
+                // Simulate upload progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    if (progress < 90) {
+                        progress += Math.random() * 10;
+                        progressBar.style.width = `${Math.min(progress, 90)}%`;
+                        progressPercentage.textContent = `${Math.round(Math.min(progress, 90))}%`;
+
+                        if (progress < 30) {
+                            progressStatus.textContent = 'Uploading file...';
+                        } else if (progress < 60) {
+                            progressStatus.textContent = 'Processing PDF...';
+                        } else {
+                            progressStatus.textContent = 'Almost done...';
+                        }
+                    }
+                }, 300);
+
+                // Actual upload
+                const uploadResponse = await fetch(`${slideUploadURL}/${userId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                clearInterval(progressInterval);
+
+                if (!uploadResponse.ok) {
+                    throw new Error('Upload failed. Please try again.');
+                }
+
+                // Complete progress bar
+                progressBar.style.width = '100%';
+                progressPercentage.textContent = '100%';
+                progressStatus.textContent = 'Upload complete!';
+
+                // Show success message
+                setTimeout(() => {
+                    statusSuccess.style.display = 'block';
+
+                    // Reset form after 2 seconds
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                }, 500);
+
+            } catch (error) {
+                // Show error message
+                showError(error.message);
+
+                // Reset upload button
+                uploadButton.disabled = false;
+                uploadButton.innerHTML = '<i class="fas fa-cloud-upload-alt me-2"></i> Upload Slide';
+            }
+        });
     });
-
 </script>
+
 <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -193,6 +667,3 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-

@@ -86,8 +86,6 @@ public class RAGImpl {
                         + "Base your answer on the following content:\n"
                         + "{{information}}");
 
-
-        log.info("INFORMATION:" + information);
         Map<String, Object> variables = new HashMap<>();
         variables.put("question", prompt);
         variables.put("information", information);

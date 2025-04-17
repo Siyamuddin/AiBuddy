@@ -1,6 +1,7 @@
 package com.example.SpringAI.Configurations;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,13 +14,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-
-
+    @Autowired
     private OauthService handler;
-    public SecurityConfig(OauthService handler) {
-        this.handler = handler;
-    }
     private static final String[] PUBLIC_URLS= {
             "/auth/login/**",
             "/auth/register/**",
@@ -35,7 +31,10 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http, Jackson2ObjectMapperBuilderCustomizer customizer) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login/**","/auth/register/**","/v3/api-docs/**","/",
+                        .requestMatchers("/auth/login/**","/auth/register/**","/v3/api-docs/**","/", "/images/**","/static/**",
+                                "/css/**",
+                                "/js/**",
+                                "/webjars/**",
                                 "/v2/api-docs/**",
                                 "/swagger-resources/**",
                                 "/swagger-ui/**",
@@ -47,10 +46,13 @@ public class SecurityConfig {
                         .authenticated()
                 )
                 .oauth2Login(Customizer.withDefaults())
-                .oauth2Login(oauth2login -> oauth2login.successHandler(handler));
-
+                .oauth2Login(oauth2login->{
+                    oauth2login.successHandler(handler);
+                });
         return http.build();
     }
 
 
 }
+
+

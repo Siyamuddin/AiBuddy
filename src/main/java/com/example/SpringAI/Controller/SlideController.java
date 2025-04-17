@@ -7,6 +7,7 @@ import com.example.SpringAI.Utility.APIResponse;
 import dev.langchain4j.agent.tool.P;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.persistence.ManyToOne;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +19,7 @@ import retrofit2.http.POST;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/slide")
 public class SlideController {
@@ -75,6 +77,7 @@ public class SlideController {
     @GetMapping("/generate/sq/{slideId}/{nsq}")
     public ResponseEntity<String> generateShortQuestions(@PathVariable Long slideId, @PathVariable String nsq) {
         if (nsq.startsWith("3")) {
+            log.error("Asking for more than 20 questions");
             throw new RuntimeException("You can not ask for more than 25 questions.");
         } else {
             String response = slideServices.generateShortQuestions(slideId, nsq);

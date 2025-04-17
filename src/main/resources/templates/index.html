@@ -12,273 +12,1242 @@
     <meta name="language" content="en">
     <meta name="robots" content="index, follow">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="https://media.licdn.com/dms/image/v2/D562DAQEroXIeXbbXZg/profile-treasury-image-shrink_800_800/profile-treasury-image-shrink_800_800/0/1733239015649?e=1733846400&v=beta&t=68nxhIzEshcUnfmMbwNhMPqIXslOSTBxfxcK--QlpKs">
-    <title>AiBuddy</title>
+    <title>AiBuddy - Your AI Study Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Resetting default styles */
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --primary-dark: #3a0ca3;
+            --secondary: #f72585;
+            --accent: #7209b7;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --success: #4CAF50;
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-light));
+            --gradient-accent: linear-gradient(135deg, var(--secondary), var(--accent));
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+            --transition: all 0.3s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Body and background */
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(to bottom, #87CEFA, #6495E3);
-            color: #fff;
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f7ff;
+            color: var(--dark);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
         /* Navbar styling */
         .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: rgba(0, 0, 0, 0.8);
+            background-color: white;
+            box-shadow: var(--shadow-md);
             position: fixed;
             width: 100%;
             z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            padding: 12px 0;
+            transition: var(--transition);
+        }
+
+        .navbar.scrolled {
+            padding: 8px 0;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .logo {
-            height: 50px;
+            height: 40px;
+            transition: var(--transition);
+        }
+
+        .logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-text span {
+            color: var(--secondary);
         }
 
         .nav-links {
             list-style: none;
             display: flex;
-            gap: 20px;
+            gap: 30px;
         }
 
         .nav-links li a {
-            color: #fff;
+            color: var(--dark);
             text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease, transform 0.3s ease;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: var(--transition);
+            position: relative;
+            padding: 5px 0;
+        }
+
+        .nav-links li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-accent);
+            transition: var(--transition);
         }
 
         .nav-links li a:hover {
-            color: #F0A500;
-            transform: scale(1.1);
+            color: var(--primary);
         }
 
-        /* Login Section */
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 70vh;
-            padding-top: 60px; /* Account for fixed navbar */
+        .nav-links li a:hover::after {
+            width: 100%;
         }
 
-        /* Adding custom font */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
-
-        .btn {
-            background: linear-gradient(45deg, #4CAF50, #67e767);
-            color: midnightblue;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            font-family: 'Roboto', sans-serif;  /* Changed font family */
-            font-weight: 600;  /* Optional: Adjust the weight for boldness */
-            border: 2px solid transparent;
-            border-radius: 50px;
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark);
             cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding-top: 120px;
+            padding-bottom: 80px;
+            background: linear-gradient(135deg, #f5f7ff 0%, #e0e6ff 100%);
             position: relative;
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, border 0.3s;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(114, 9, 183, 0.1));
+            z-index: 0;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(247, 37, 133, 0.1), rgba(114, 9, 183, 0.1));
+            z-index: 0;
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
             z-index: 1;
         }
 
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(120deg, #4CAF50, #67e767, #8df58d);
-            z-index: -1;
-            transform: rotate(0deg);
-            transition: transform 0.5s ease-in-out;
+        .hero-text {
+            flex: 1;
+            max-width: 600px;
         }
 
-        .btn:hover::before {
-            transform: rotate(45deg);
-        }
-
-        .btn:hover {
-            transform: translateY(-5px) scale(1.1);
-            box-shadow: 0 10px 30px rgba(103, 231, 103, 0.5);
-            border: 2px solid #ffffff;
-        }
-
-        .btn::after {
-            content: '';
-            position: absolute;
-            width: 120%;
-            height: 120%;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            z-index: 0;
-            transition: transform 0.4s ease-out;
-        }
-
-        .btn:hover::after {
-            transform: translate(-50%, -50%) scale(1.2);
-            opacity: 1;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
-        }
-
-        /* Sections styling */
-        .section {
-            padding: 60px 20px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.6);
-            margin: 20px auto;
-            max-width: 800px;
-            border-radius: 10px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-        }
-
-        .section h2 {
-            font-size: 2.5rem;
+        .hero-title {
+            font-size: 3rem;
             margin-bottom: 20px;
-            color: #F0A500;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            color: var(--dark);
+            line-height: 1.2;
         }
 
-        .section p {
-            font-size: 1.1rem;
-            line-height: 1.8;
+        .hero-title span {
+            color: var(--primary);
+            position: relative;
+            display: inline-block;
         }
 
-        /* Footer styling */
-        footer {
-            text-align: center;
-            background: rgba(0, 0, 0, 0.9);
-            padding: 15px 10px;
-            font-size: 0.9rem;
-            color: #bbb;
-            margin-top: auto;
-            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4);
+        .hero-title span::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background-color: rgba(67, 97, 238, 0.2);
+            z-index: -1;
         }
 
-        footer a {
-            color: #F0A500;
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 30px;
+        }
+
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            max-width: 500px;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: var(--transition);
             text-decoration: none;
-            transition: color 0.3s ease, transform 0.3s ease;
+            border: none;
+            outline: none;
+            gap: 8px;
         }
 
-        footer a:hover {
-            color: #fff;
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-icon {
+            margin-right: 8px;
+        }
+
+        /* Features Section */
+        .section {
+            padding: 80px 0;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--gradient-accent);
+            border-radius: var(--radius-full);
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background-color: white;
+            border-radius: var(--radius-md);
+            padding: 30px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05), rgba(114, 9, 183, 0.05));
+            transition: var(--transition);
+            z-index: -1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-card:hover::before {
+            height: 100%;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-md);
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .feature-description {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        /* About Section */
+        .about {
+            background-color: white;
+        }
+
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .about-image {
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .about-image img {
+            width: 100%;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-title {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .about-description {
+            color: var(--gray);
+            margin-bottom: 25px;
+        }
+
+        .about-points {
+            list-style: none;
+        }
+
+        .about-points li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .about-points li i {
+            color: var(--success);
+            font-size: 1.2rem;
+            margin-top: 3px;
+        }
+
+        /* Services Section */
+        .services {
+            background-color: #f5f7ff;
+        }
+
+        .service-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .service-card {
+            background-color: white;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .service-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .service-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .service-card:hover .service-image img {
             transform: scale(1.1);
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .nav-links {
+        .service-content {
+            padding: 25px;
+        }
+
+        .service-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .service-description {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        /* Contact Section */
+        .contact {
+            background-color: white;
+        }
+
+        .contact-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-full);
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .contact-details h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .contact-details p, .contact-details a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .contact-details a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            background-color: #f5f7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background: var(--gradient-primary);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        /* Footer */
+        footer {
+            background-color: #1a1a2e;
+            color: #f5f5f5;
+            padding: 40px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo img {
+            height: 40px;
+        }
+
+        .footer-logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .footer-logo-text span {
+            color: var(--secondary);
+        }
+
+        .footer-description {
+            color: #b3b3b3;
+            margin-bottom: 20px;
+        }
+
+        .footer-heading {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: white;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--gradient-accent);
+            border-radius: var(--radius-full);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #b3b3b3;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .footer-links a i {
+            font-size: 0.8rem;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #b3b3b3;
+            font-size: 0.9rem;
+        }
+
+        .footer-bottom a {
+            color: var(--primary-light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-bottom a:hover {
+            color: white;
+        }
+
+        /* Login Modal */
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .login-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .login-container {
+            background-color: white;
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .login-modal.active .login-container {
+            transform: translateY(0);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--secondary);
+            transform: rotate(90deg);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            color: var(--gray);
+        }
+
+        .login-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            border: 1px solid #e0e0e0;
+            background-color: white;
+            color: var(--dark);
+            gap: 10px;
+        }
+
+        .login-btn:hover {
+            background-color: #f5f5f5;
+            transform: translateY(-3px);
+        }
+
+        .login-btn i {
+            font-size: 1.2rem;
+        }
+
+        .google-btn {
+            color: #4285F4;
+        }
+
+        .microsoft-btn {
+            color: #00a4ef;
+        }
+
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: var(--gray);
+        }
+
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #e0e0e0;
+        }
+
+        .login-divider span {
+            padding: 0 10px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .about-content {
                 flex-direction: column;
-                gap: 10px;
             }
 
-            .section {
-                padding: 40px 15px;
-                margin: 10px 15px;
-            }
-
-            .section h2 {
-                font-size: 2rem;
-            }
-
-            .section p {
-                font-size: 1rem;
+            .about-image {
+                max-width: 100%;
+                margin-bottom: 30px;
             }
         }
 
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: white;
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: var(--shadow-md);
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: var(--transition);
+                z-index: 999;
+            }
 
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-text {
+                margin-bottom: 40px;
+            }
+
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .section-title h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .section {
+                padding: 60px 0;
+            }
+
+            .section-title {
+                margin-bottom: 40px;
+            }
+
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+
+            .feature-card, .service-card {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
 <!-- Navigation Bar -->
 <header class="navbar">
-<!--    <img src="aibuddy.png" alt="AiBuddy Image" class="logo">-->
-    <img th:src="@{/aibuddy.png}" alt="AiBuddy Image" class="logo">
-
-    <nav>
-        <ul class="nav-links">
-            <li><a href="#about">About</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
+    <div class="container navbar-container">
+        <div class="logo-container">
+            <img th:src="@{/aibuddy.png}" alt="AiBuddy Logo" class="logo">
+            <div class="logo-text">Ai<span>Buddy</span></div>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#" id="login-link">Login</a></li>
+            </ul>
+        </nav>
+        <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
 </header>
 
-<!-- Main Section -->
-<main>
-    <div class="login-container">
-        <button id="google-login" class="btn">Login with Google</button>
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container hero-content">
+        <div class="hero-text">
+            <h1 class="hero-title">Transform Your Study Experience with <span>AI Buddy</span></h1>
+            <p class="hero-subtitle">Your intelligent study assistant that turns lecture slides into comprehensive study materials, helping you prepare for exams more effectively.</p>
+            <button id="google-login" class="btn btn-primary">
+                <i class="fab fa-google btn-icon"></i>
+                Login with Google
+            </button>
+        </div>
+        <div class="hero-image">
+            <img src="/placeholder.svg?height=400&width=500" alt="AI Buddy in action">
+        </div>
     </div>
-</main>
+</section>
+
+<!-- Features Section -->
+<section class="section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Why Choose AI Buddy</h2>
+            <p class="section-subtitle">Discover how our AI-powered platform can revolutionize your study routine and help you achieve better results.</p>
+        </div>
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="feature-title">AI-Powered Insights</h3>
+                <p class="feature-description">Our advanced AI analyzes your lecture slides to generate comprehensive summaries, questions, and study materials tailored to your needs.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3 class="feature-title">Effortless Organization</h3>
+                <p class="feature-description">Manage your classes and study materials in one place with our intuitive interface, making it easy to stay organized throughout the semester.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3 class="feature-title">Exam Preparation</h3>
+                <p class="feature-description">Practice with automatically generated MCQs and short-answer questions that help you test your knowledge and prepare for exams effectively.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- About Section -->
-<section id="about" class="section">
-    <h2>About Us</h2>
-    <p>
-
-        Welcome to AI Buddy, your smart study assistant!
-
-        We make exam preparation easier by transforming your lecture slides into study materials. Simply Login---> upload your PDFs, and our AI generates---> summaries,---> multiple-choice questions,---> short-answer questions tailored to your needs.
-
-        With secure login, easy class management, and instant answers to your queries, AI Buddy helps you focus on learning effectively.
-
-        Start studying smarter today.
-    </p>
+<section id="about" class="section about">
+    <div class="container">
+        <div class="about-content">
+            <div class="about-image">
+                <img src="/placeholder.svg?height=400&width=500" alt="About AI Buddy">
+            </div>
+            <div class="about-text">
+                <h2 class="about-title">About AI Buddy</h2>
+                <p class="about-description">
+                    Welcome to AI Buddy, your smart study assistant! We make exam preparation easier by transforming your lecture slides into comprehensive study materials.
+                </p>
+                <p class="about-description">
+                    Simply login, upload your PDFs, and our AI generates summaries, multiple-choice questions, and short-answer questions tailored to your specific learning needs.
+                </p>
+                <ul class="about-points">
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Secure login and data protection with advanced JWT authentication</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Easy class management and organization of study materials</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Instant answers to your academic queries</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Focus on effective learning with AI-generated study content</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- Services Section -->
-<section id="services" class="section">
-    <h2>Our Services</h2>
-    <p>
-        Seamless Class Management: Organize your study materials effortlessly by creating classes and uploading lecture slides.
-        AI Study Assistance: Receive instant, accurate answers to your queries and enhance your understanding of complex topics.
-        Exam Preparation Made Easy: Prepare for exams with automatically generated MCQs, short-answer questions, and comprehensive summaries.
-        Secure and Reliable: Your data is protected with advanced JWT authentication for a safe and trusted experience.
-        Interactive Interface: Explore our platform's capabilities with a user-friendly Swagger UI.
-
-    </p>
+<section id="services" class="section services">
+    <div class="container">
+        <div class="section-title">
+            <h2>Our Services</h2>
+            <p class="section-subtitle">Explore the range of features designed to enhance your learning experience and academic performance.</p>
+        </div>
+        <div class="service-cards">
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="/placeholder.svg?height=200&width=300" alt="Class Management">
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Seamless Class Management</h3>
+                    <p class="service-description">Organize your study materials effortlessly by creating classes and uploading lecture slides in a structured, easy-to-navigate interface.</p>
+                </div>
+            </div>
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="/placeholder.svg?height=200&width=300" alt="AI Study Assistance">
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">AI Study Assistance</h3>
+                    <p class="service-description">Receive instant, accurate answers to your queries and enhance your understanding of complex topics with our advanced AI technology.</p>
+                </div>
+            </div>
+            <div class="service-card">
+                <div class="service-image">
+                    <img src="/placeholder.svg?height=200&width=300" alt="Exam Preparation">
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Exam Preparation Made Easy</h3>
+                    <p class="service-description">Prepare for exams with automatically generated MCQs, short-answer questions, and comprehensive summaries tailored to your course content.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- Contact Section -->
-<section id="contact" class="section">
-    <h2>Contact Us</h2>
-    <p>
-        aibuddy111@gmail.com
-    </p>
+<section id="contact" class="section contact">
+    <div class="container">
+        <div class="section-title">
+            <h2>Contact Us</h2>
+            <p class="section-subtitle">Have questions or feedback? We'd love to hear from you!</p>
+        </div>
+        <div class="contact-content">
+            <div class="contact-info">
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h3>Email</h3>
+                        <a href="mailto:aibuddy111@gmail.com">aibuddy111@gmail.com</a>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h3>Location</h3>
+                        <p>Online Service - Available Worldwide</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="contact-details">
+                        <h3>Website</h3>
+                        <a href="https://aibuddy.digital" target="_blank">aibuddy.digital</a>
+                    </div>
+                </div>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="contact-image">
+                <img src="/placeholder.svg?height=300&width=400" alt="Contact Us">
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- Footer -->
 <footer>
-    <p>&copy; 2024 aibuddy.digital All rights reserved.</p>
+    <div class="container">
+        <div class="footer-content">
+            <div>
+                <div class="footer-logo">
+                    <img th:src="@{/aibuddy.png}" alt="AiBuddy Logo" class="logo">
+                    <div class="footer-logo-text">Ai<span>Buddy</span></div>
+                </div>
+                <p class="footer-description">
+                    Your AI-powered study assistant that transforms lecture slides into comprehensive study materials.
+                </p>
+            </div>
+            <div>
+                <h3 class="footer-heading">Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Home</a></li>
+                    <li><a href="#about"><i class="fas fa-chevron-right"></i> About</a></li>
+                    <li><a href="#services"><i class="fas fa-chevron-right"></i> Services</a></li>
+                    <li><a href="#contact"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="footer-heading">Services</h3>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Class Management</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> AI Study Assistance</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Exam Preparation</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Content Summarization</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 <a href="https://aibuddy.digital">aibuddy.digital</a> All rights reserved.</p>
+        </div>
+    </div>
 </footer>
 
+<!-- Login Modal -->
+<div class="login-modal" id="login-modal">
+    <div class="login-container">
+        <button class="close-modal" id="close-modal">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="login-header">
+            <h2 class="login-title">Welcome Back</h2>
+            <p class="login-subtitle">Sign in to continue to AI Buddy</p>
+        </div>
+        <div class="login-options">
+            <button id="google-login-modal" class="login-btn google-btn">
+                <i class="fab fa-google"></i>
+                Continue with Google
+            </button>
+            <button class="login-btn microsoft-btn">
+                <i class="fab fa-microsoft"></i>
+                Continue with Microsoft
+            </button>
+            <div class="login-divider">
+                <span>or</span>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;">
+                <i class="fas fa-envelope btn-icon"></i>
+                Continue with Email
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // Redirect the user to the profile page on login
-    document.getElementById('google-login').addEventListener('click', () => {
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+
+    mobileMenuBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        mobileMenuBtn.innerHTML = navLinks.classList.contains('active')
+            ? '<i class="fas fa-times"></i>'
+            : '<i class="fas fa-bars"></i>';
+    });
+
+    // Navbar Scroll Effect
+    window.addEventListener('scroll', () => {
+        const navbar = document.querySelector('.navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // Login Modal
+    const loginLink = document.getElementById('login-link');
+    const loginModal = document.getElementById('login-modal');
+    const closeModal = document.getElementById('close-modal');
+    const googleLoginBtn = document.getElementById('google-login');
+    const googleLoginModalBtn = document.getElementById('google-login-modal');
+
+    loginLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+
+    closeModal.addEventListener('click', () => {
+        loginModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    });
+
+    // Close modal when clicking outside
+    loginModal.addEventListener('click', (e) => {
+        if (e.target === loginModal) {
+            loginModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // Google Login Buttons
+    googleLoginBtn.addEventListener('click', () => {
         window.location.href = '/view/profile';
+    });
+
+    googleLoginModalBtn.addEventListener('click', () => {
+        window.location.href = '/view/profile';
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            if (this.getAttribute('href') !== '#') {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+                // Close mobile menu if open
+                navLinks.classList.remove('active');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        });
     });
 </script>
 <script type="application/ld+json">
@@ -294,6 +1263,5 @@
         ]
     }
 </script>
-
 </body>
 </html>

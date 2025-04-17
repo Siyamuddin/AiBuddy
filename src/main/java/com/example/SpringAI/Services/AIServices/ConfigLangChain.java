@@ -46,7 +46,7 @@ public class ConfigLangChain {
         for (String question : splitQuestions) {
             questions.add(question.trim()); // Trim each question to remove any extra spaces
         }
-        log.info("Generated questions: "+questions);
+
         return questions;
     }
 

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-  <meta name="description" content="Revolutionize learning with AiBuddy! Upload lecture slides, generate summaries, MCQs, and short-answer questions, and prepare for exams with AI-powered insights. Secure, efficient, and user-friendly.">
-  <meta name="keywords" content="AI-powered study tools, class management, lecture slides processing, exam preparation, MCQ generation, short-answer questions, Java Spring Boot, JWT authentication, Llama AI, Langchain4j, educational technology">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Revolutionize learning with AiBuddy! Upload lecture slides, generate summaries, MCQs, and short-answer questions, and prepare for exams with AI-powered insights.">
+  <meta name="keywords" content="AI-powered study tools, class management, lecture slides processing, exam preparation, MCQ generation, short-answer questions, Java Spring Boot, educational technology">
   <meta name="author" content="UDDIN SIYAM">
   <meta property="og:title" content="AiBuddy - AI-Powered Student Class Management System">
   <meta property="og:description" content="Transform the way students prepare for exams with AiBuddy. Upload lecture slides, generate summaries, MCQs, and more using AI-powered insights.">
@@ -11,305 +13,947 @@
   <meta property="og:type" content="website">
   <meta name="language" content="en">
   <meta name="robots" content="index, follow">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="https://media.licdn.com/dms/image/v2/D562DAQEroXIeXbbXZg/profile-treasury-image-shrink_800_800/profile-treasury-image-shrink_800_800/0/1733239015649?e=1733846400&v=beta&t=68nxhIzEshcUnfmMbwNhMPqIXslOSTBxfxcK--QlpKs">
-  <title>Profile</title>
+  <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
+  <title>User Profile | AiBuddy</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --primary-dark: #3f37c9;
+      --secondary: #4cc9f0;
+      --accent: #f72585;
+      --success: #06d6a0;
+      --warning: #ffd166;
+      --danger: #ef476f;
+      --dark: #212529;
+      --light: #f8f9fa;
+      --gray: #6c757d;
+      --gray-light: #e9ecef;
+      --text: #2b2d42;
+      --text-light: #8d99ae;
+      --white: #ffffff;
+      --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+      --gradient-accent: linear-gradient(135deg, var(--accent), var(--primary-light));
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 24px;
+      --radius-full: 9999px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
       margin: 0;
       padding: 0;
-      background: rgb(100, 149, 227);
-      color: #333;
+      box-sizing: border-box;
     }
 
-    .profile-container {
-      max-width: 600px;
-      margin: 50px auto;
-      background: #FFFFFFDD;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      position: relative;
-    }
-
-    .profile-header {
-      background: #4CAF50;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-      position: relative;
-    }
-
-    .profile-header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
-
-    .profile-actions {
-      position: absolute;
-      top: 20px;
-      right: 20px;
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f2f5;
+      background-image:
+              radial-gradient(at 40% 20%, hsla(217, 100%, 74%, 0.1) 0px, transparent 50%),
+              radial-gradient(at 80% 0%, hsla(189, 100%, 56%, 0.1) 0px, transparent 50%),
+              radial-gradient(at 0% 50%, hsla(355, 100%, 93%, 0.1) 0px, transparent 50%),
+              radial-gradient(at 80% 50%, hsla(340, 100%, 76%, 0.1) 0px, transparent 50%),
+              radial-gradient(at 0% 100%, hsla(22, 100%, 77%, 0.1) 0px, transparent 50%),
+              radial-gradient(at 80% 100%, hsla(242, 100%, 70%, 0.1) 0px, transparent 50%),
+              radial-gradient(at 0% 0%, hsla(343, 100%, 76%, 0.1) 0px, transparent 50%);
+      min-height: 100vh;
       display: flex;
-      gap: 10px;
-    }
-
-    .profile-actions button {
-      background: #fff;
-      border: none;
-      padding: 5px 10px;
-      font-size: 14px;
-      cursor: pointer;
-      border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .profile-actions button:hover {
-      background: #ddd;
-    }
-
-    .profile-details {
+      justify-content: center;
+      align-items: center;
       padding: 20px;
+      color: var(--text);
+    }
+
+    /* Glassmorphism Card */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: var(--shadow-lg);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: var(--transition);
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Profile Header */
+    .profile-header {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+    }
+
+    .profile-cover {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: var(--gradient);
+      z-index: 1;
+    }
+
+    .profile-header-content {
+      position: relative;
+      z-index: 2;
       display: flex;
       flex-direction: column;
-      gap: 15px;
       align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--white);
+      text-align: center;
+      padding: 20px;
+    }
+
+    .profile-name {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-tagline {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    /* Profile Image */
+    .profile-image-container {
+      position: absolute;
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+    }
+
+    .profile-image-wrapper {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: var(--radius-full);
+      background: var(--white);
+      padding: 5px;
+      box-shadow: var(--shadow-md);
     }
 
     .profile-image {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius-full);
       object-fit: cover;
-      border: 4px solid #4CAF50;
+    }
+
+    .status-indicator {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-full);
+      background: var(--success);
+      border: 3px solid var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Profile Actions */
+    .profile-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 3;
+      border-bottom-left-radius: var(--radius-md);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      font-size: 0.875rem;
+      transition: var(--transition);
+      cursor: pointer;
+      border: none;
+      outline: none;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: var(--radius-full);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--primary);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.95);
+      transform: translateY(-2px);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: var(--white);
+    }
+
+    .btn-danger:hover {
+      background: #d64161;
+      transform: translateY(-2px);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: var(--white);
+    }
+
+    .btn-success:hover {
+      background: #05b589;
+      transform: translateY(-2px);
+    }
+
+    /* Profile Content */
+    .profile-content {
+      padding: 80px 30px 30px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    @media (min-width: 768px) {
+      .profile-content {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Profile Section */
+    .profile-section {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+
+    .profile-section:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title i {
+      font-size: 1.1rem;
+    }
+
+    /* Profile Details */
+    .profile-details {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
 
     .detail-row {
-      width: 100%;
       display: flex;
-      justify-content: space-between;
       align-items: center;
       padding: 10px 0;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
     .detail-row:last-child {
       border-bottom: none;
     }
 
+    .detail-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+      border-radius: var(--radius-full);
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+
+    .detail-content {
+      flex: 1;
+    }
+
     .detail-label {
-      font-weight: bold;
-      color: #555;
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-bottom: 2px;
     }
 
-    .detail-value,
-    .detail-input {
-      color: #333;
-      text-align: right;
-      width: 70%;
+    .detail-value {
+      font-weight: 500;
     }
 
     .detail-input {
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      padding: 5px;
-      font-size: 14px;
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      font-family: inherit;
+      font-size: 0.875rem;
+      transition: var(--transition);
     }
 
+    .detail-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    /* Action Cards */
+    .action-cards {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .action-card {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .action-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .action-card-icon {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gradient);
+      color: var(--white);
+      border-radius: var(--radius-full);
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+    }
+
+    .action-card:nth-child(2) .action-card-icon {
+      background: var(--gradient-accent);
+    }
+
+    .action-card-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .action-card-description {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      margin-bottom: 15px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary);
+      color: white;
+      border-radius: var(--radius-full);
+      width: 24px;
+      height: 24px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-20px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .glass-card {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .profile-section {
+      animation: fadeIn 0.6s ease-out;
+      animation-fill-mode: both;
+    }
+
+    .profile-section:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .profile-section:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .action-card {
+      animation: fadeIn 0.6s ease-out;
+      animation-fill-mode: both;
+    }
+
+    .action-card:nth-child(1) {
+      animation-delay: 0.3s;
+    }
+
+    .action-card:nth-child(2) {
+      animation-delay: 0.4s;
+    }
+
+    .detail-row {
+      animation: slideIn 0.4s ease-out;
+      animation-fill-mode: both;
+    }
+
+    .detail-row:nth-child(1) { animation-delay: 0.1s; }
+    .detail-row:nth-child(2) { animation-delay: 0.2s; }
+    .detail-row:nth-child(3) { animation-delay: 0.3s; }
+    .detail-row:nth-child(4) { animation-delay: 0.4s; }
+    .detail-row:nth-child(5) { animation-delay: 0.5s; }
+    .detail-row:nth-child(6) { animation-delay: 0.6s; }
+
+    .action-card-icon {
+      animation: pulse 2s infinite;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transform: translateX(120%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--success);
+      color: var(--white);
+      border-radius: var(--radius-full);
+      flex-shrink: 0;
+    }
+
+    .toast-content {
+      flex: 1;
+    }
+
+    .toast-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .toast-message {
+      font-size: 0.875rem;
+      color: var(--text-light);
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--gray);
+      font-size: 1.25rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 767px) {
+      .profile-header {
+        height: 150px;
+      }
+
+      .profile-image-wrapper {
+        width: 100px;
+        height: 100px;
+      }
+
+      .profile-image-container {
+        bottom: -50px;
+      }
+
+      .profile-content {
+        padding-top: 60px;
+      }
+
+      .profile-name {
+        font-size: 1.5rem;
+      }
+
+      .profile-actions {
+        position: relative;
+        justify-content: center;
+        padding: 15px;
+        margin-top: 60px;
+        border-radius: 0;
+      }
+
+      .action-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Utility Classes */
     .hidden {
       display: none;
     }
 
-    /* Upload Slide Button */
-    .upload-slide-container {
+    .text-center {
       text-align: center;
-      margin-top: 20px;
     }
 
-    .upload-slide-button {
-      background: #4CAF50;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      font-weight: bold;
-      text-transform: uppercase;
-      border-radius: 5px;
-      cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      transition: background 0.3s ease;
+    .mt-4 {
+      margin-top: 1rem;
     }
 
-    .upload-slide-button:hover {
-      background: #45a049;
-    }
-
-    #delete {
-      background-color: red;
-      color: white;
-      border: none;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 16px;
-      cursor: pointer;
-
+    .w-full {
+      width: 100%;
     }
   </style>
 </head>
 <body>
-<div class="profile-container">
-  <div class="profile-header">
-    <h1><span th:text="${user.getFirstName()} + ' ' + ${user.getLastName()}"></span></h1>
-    <div class="profile-actions">
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+  <div class="toast-icon">
+    <i class="fas fa-check"></i>
+  </div>
+  <div class="toast-content">
+    <div class="toast-title">Success!</div>
+    <div class="toast-message" id="toastMessage">Your profile has been updated.</div>
+  </div>
+  <button class="toast-close" onclick="hideToast()">
+    <i class="fas fa-times"></i>
+  </button>
+</div>
 
-      <button id="editButton">Edit</button>
-      <button id="delete">Delete</button>
+<div class="glass-card">
+  <!-- Profile Header -->
+  <div class="profile-header">
+    <div class="profile-cover"></div>
+    <div class="profile-header-content">
+      <h1 class="profile-name" th:text="${user.getFirstName()} + ' ' + ${user.getLastName()}">James Watson</h1>
+      <p class="profile-tagline" th:text="${user.getUniversity()}">Stanford University</p>
+    </div>
+
+    <!-- Profile Image -->
+    <div class="profile-image-container">
+      <div class="profile-image-wrapper">
+        <img class="profile-image" th:src="${user.getImage()}" alt="Profile Photo">
+        <div class="status-indicator"></div>
+      </div>
+    </div>
+
+    <!-- Profile Actions -->
+    <div class="profile-actions">
+      <button id="editButton" class="btn btn-secondary">
+        <i class="fas fa-edit"></i>
+        <span class="d-none d-md-inline">Edit</span>
+      </button>
+      <button id="deleteButton" class="btn btn-danger">
+        <i class="fas fa-trash-alt"></i>
+        <span class="d-none d-md-inline">Delete</span>
+      </button>
+      <button id="updateButton" class="btn btn-success hidden">
+        <i class="fas fa-save"></i>
+        <span class="d-none d-md-inline">Save</span>
+      </button>
+
+      <!-- Hidden fields for JavaScript -->
       <input type="hidden" id="userId" th:value="${user.getId()}">
       <input type="hidden" id="deleteUserURL" th:value="${deleteUserURL}">
       <input type="hidden" id="updateUserURL" th:value="${updateUserURL}">
       <input type="hidden" id="homePage" th:value="${homePage}">
       <input type="hidden" id="deleteRelocateURL" th:value="${deleteRelocateURL}">
-
-      <button id="updateButton" class="hidden">Update</button>
-
     </div>
   </div>
 
-  <div class="profile-details">
-    <img class="profile-image" th:src="|${user.getImage()}|" alt="User Photo">
+  <!-- Profile Content -->
+  <div class="profile-content">
+    <!-- Personal Information -->
+    <div class="profile-section">
+      <h2 class="section-title">
+        <i class="fas fa-user"></i> Personal Information
+      </h2>
+      <div class="profile-details">
+        <div class="detail-row">
+          <div class="detail-icon">
+            <i class="fas fa-id-card"></i>
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">First Name</div>
+            <div class="detail-value" th:text="${user.getFirstName()}" id="firstNameValue"></div>
+            <input class="detail-input hidden" type="text" id="firstNameInput">
+          </div>
+        </div>
 
-    <div class="detail-row">
-      <span class="detail-label">First Name:</span>
-      <span class="detail-value" th:text="${user.getFirstName()}" id="firstNameValue"></span>
-      <input class="detail-input hidden" type="text" id="firstNameInput">
+        <div class="detail-row">
+          <div class="detail-icon">
+            <i class="fas fa-id-card"></i>
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Last Name</div>
+            <div class="detail-value" th:text="${user.getLastName()}" id="lastNameValue"></div>
+            <input class="detail-input hidden" type="text" id="lastNameInput">
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Email Address</div>
+            <div class="detail-value" th:text="${user.getEmail()}" id="emailValue"></div>
+            <input class="detail-input hidden" type="email" id="emailInput">
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="detail-row">
-      <span class="detail-label">Last Name:</span>
-      <span class="detail-value" th:text="${user.getLastName()}" id="lastNameValue"></span>
-      <input class="detail-input hidden" type="text" id="lastNameInput">
+
+    <!-- Academic Information -->
+    <div class="profile-section">
+      <h2 class="section-title">
+        <i class="fas fa-graduation-cap"></i> Academic Information
+      </h2>
+      <div class="profile-details">
+        <div class="detail-row">
+          <div class="detail-icon">
+            <i class="fas fa-university"></i>
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">University</div>
+            <div class="detail-value" th:text="${user.getUniversity()}" id="universityValue"></div>
+            <input class="detail-input hidden" type="text" id="universityInput">
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-icon">
+            <i class="fas fa-book"></i>
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Department</div>
+            <div class="detail-value" th:text="${user.getDepartment()}" id="departmentValue"></div>
+            <input class="detail-input hidden" type="text" id="departmentInput">
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-icon">
+            <i class="fas fa-globe"></i>
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Country</div>
+            <div class="detail-value" th:text="${user.getCountry()}" id="countryValue"></div>
+            <input class="detail-input hidden" type="text" id="countryInput">
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="detail-row">
-      <span class="detail-label">Email:</span>
-      <span class="detail-value" th:text="${user.getEmail()}" id="emailValue"></span>
-      <input class="detail-input hidden" type="email" id="emailInput">
+
+    <!-- Action Cards -->
+    <div class="action-cards">
+      <a th:href="@{/view/upload/slide}" class="action-card">
+        <div class="action-card-icon">
+          <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <h3 class="action-card-title">Upload Slides</h3>
+        <p class="action-card-description">Upload lecture slides for AI processing</p>
+      </a>
+
+      <a th:href="@{/view/get/all/slide}" class="action-card">
+        <div class="action-card-icon">
+          <i class="fas fa-folder-open"></i>
+        </div>
+        <h3 class="action-card-title">My Slides</h3>
+        <p class="action-card-description">View and manage your uploaded slides</p>
+        <span class="badge" th:text="${size}">5</span>
+      </a>
     </div>
-    <div class="detail-row">
-      <span class="detail-label">University:</span>
-      <span class="detail-value" th:text="${user.getUniversity()}" id="universityValue"></span>
-      <input class="detail-input hidden" type="text" id="universityInput">
-    </div>
-    <div class="detail-row">
-      <span class="detail-label">Department:</span>
-      <span class="detail-value" th:text="${user.getDepartment()}" id="departmentValue"></span>
-      <input class="detail-input hidden" type="text" id="departmentInput">
-    </div>
-    <div class="detail-row">
-      <span class="detail-label">Country:</span>
-      <span class="detail-value" th:text="${user.getCountry()}" id="countryValue"></span>
-      <input class="detail-input hidden" type="text" id="countryInput">
-    </div>
-  </div>
-  <!-- Redirect Button -->
-  <div class="upload-slide-container">
-    <a th:href="@{/view/upload/slide}">
-    <button class="upload-slide-button">Go to Upload Slide</button>
-    </a>
-  </div>
-  <div class="upload-slide-container">
-    <a th:href="@{/view/get/all/slide}">
-      <button class="upload-slide-button">Slides(<span th:text="${size}"></span>)</button>
-    </a>
   </div>
 </div>
 
 <script>
-  const editButton = document.getElementById("editButton");
-  const updateButton = document.getElementById("updateButton");
-  const deleteButton=document.getElementById("delete");
+  document.addEventListener('DOMContentLoaded', function() {
+    const editButton = document.getElementById('editButton');
+    const updateButton = document.getElementById('updateButton');
+    const deleteButton = document.getElementById('deleteButton');
 
-  const valueFields = document.querySelectorAll(".detail-value");
-  const inputFields = document.querySelectorAll(".detail-input");
+    const valueFields = document.querySelectorAll('.detail-value');
+    const inputFields = document.querySelectorAll('.detail-input');
 
-
-  editButton.addEventListener("click", () => {
-    valueFields.forEach(field => field.classList.add("hidden"));
-    inputFields.forEach((field, index) => {
-      field.classList.remove("hidden");
-      field.value = valueFields[index].textContent;
-    });
-    editButton.classList.add("hidden");
-    updateButton.classList.remove("hidden");
-  });
-
-  deleteButton.addEventListener("click", async () => {
-    const userId = document.getElementById("userId").value; // Replace with user ID logic
-    const deleteUserURL=document.getElementById("deleteUserURL").value;
-
-    const confirmDeletion = confirm("Are you sure you want to delete this account?");
-
-    if (confirmDeletion) {
-      try {
-        const response = await fetch(`${deleteUserURL}/${userId}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        if (response.ok) {
-          alert("User deleted successfully.");
-          window.location.href = 'http://localhost:8080/login';
-          const deleteRelocateURL=document.getElementById("deleteRelocateURL").value;
-          window.redirectUrl=deleteRelocateURL;
-        } else {
-          alert("Couldn't delete the user.");
-        }
-      } catch (error) {
-        console.error("Error deleting user:", error);
-        alert("An error occurred while deleting the user.");
-      }
-    } else {
-      alert("User deletion canceled.");
-    }
-  });
-
-
-  updateButton.addEventListener("click", async () => {
-    const updatedData = {
-      firstName: document.getElementById("firstNameInput").value,
-      lastName: document.getElementById("lastNameInput").value,
-      email: document.getElementById("emailInput").value,
-      university: document.getElementById("universityInput").value,
-      department: document.getElementById("departmentInput").value,
-      country: document.getElementById("countryInput").value,
-
-    };
-
-    const userId =document.getElementById("userId").value;/* Replace with user ID logic */;
-    const updateUserURL=document.getElementById("updateUserURL").value;
-
-    try {
-      const response = await fetch(`${updateUserURL}/${userId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedData),
+    // Enable edit mode
+    editButton.addEventListener('click', () => {
+      valueFields.forEach(field => field.classList.add('hidden'));
+      inputFields.forEach((field, index) => {
+        field.classList.remove('hidden');
+        field.value = valueFields[index].textContent.trim();
       });
 
-      if (response.ok) {
-        location.reload(); // Reload the page to reflect changes
-      } else {
-        alert("Failed to update user information");
+      editButton.classList.add('hidden');
+      updateButton.classList.remove('hidden');
+    });
+
+    // Handle update
+    updateButton.addEventListener('click', async () => {
+      const userId = document.getElementById('userId').value;
+      const updateUserURL = document.getElementById('updateUserURL').value;
+
+      const updatedData = {
+        firstName: document.getElementById('firstNameInput').value,
+        lastName: document.getElementById('lastNameInput').value,
+        email: document.getElementById('emailInput').value,
+        university: document.getElementById('universityInput').value,
+        department: document.getElementById('departmentInput').value,
+        country: document.getElementById('countryInput').value
+      };
+
+      try {
+        const response = await fetch(`${updateUserURL}/${userId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updatedData)
+        });
+
+        if (response.ok) {
+          showToast('Profile updated successfully!');
+
+          setTimeout(() => {
+            location.reload();
+          }, 2000);
+        } else {
+          showToast('Failed to update profile information', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        showToast('An error occurred while updating your profile', 'error');
       }
-    } catch (error) {
-      console.error("Error updating user information:", error);
-    }
+    });
+
+    // Handle delete
+    deleteButton.addEventListener('click', async () => {
+      const userId = document.getElementById('userId').value;
+      const deleteUserURL = document.getElementById('deleteUserURL').value;
+      const deleteRelocateURL = document.getElementById('deleteRelocateURL').value;
+
+      // Create modal for confirmation
+      const modal = document.createElement('div');
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.zIndex = '1000';
+
+      const modalContent = document.createElement('div');
+      modalContent.style.backgroundColor = 'white';
+      modalContent.style.borderRadius = 'var(--radius-md)';
+      modalContent.style.padding = '30px';
+      modalContent.style.width = '90%';
+      modalContent.style.maxWidth = '400px';
+      modalContent.style.textAlign = 'center';
+      modalContent.style.boxShadow = 'var(--shadow-lg)';
+
+      const modalTitle = document.createElement('h3');
+      modalTitle.textContent = 'Delete Account';
+      modalTitle.style.marginBottom = '15px';
+      modalTitle.style.color = 'var(--danger)';
+      modalTitle.style.fontSize = '1.5rem';
+
+      const modalText = document.createElement('p');
+      modalText.textContent = 'Are you sure you want to delete your account? This action cannot be undone.';
+      modalText.style.marginBottom = '25px';
+
+      const buttonContainer = document.createElement('div');
+      buttonContainer.style.display = 'flex';
+      buttonContainer.style.justifyContent = 'center';
+      buttonContainer.style.gap = '15px';
+
+      const cancelButton = document.createElement('button');
+      cancelButton.textContent = 'Cancel';
+      cancelButton.className = 'btn btn-secondary';
+      cancelButton.style.padding = '10px 20px';
+
+      const confirmButton = document.createElement('button');
+      confirmButton.textContent = 'Delete Account';
+      confirmButton.className = 'btn btn-danger';
+      confirmButton.style.padding = '10px 20px';
+
+      buttonContainer.appendChild(cancelButton);
+      buttonContainer.appendChild(confirmButton);
+
+      modalContent.appendChild(modalTitle);
+      modalContent.appendChild(modalText);
+      modalContent.appendChild(buttonContainer);
+
+      modal.appendChild(modalContent);
+      document.body.appendChild(modal);
+
+      // Handle modal actions
+      cancelButton.addEventListener('click', () => {
+        document.body.removeChild(modal);
+      });
+
+      confirmButton.addEventListener('click', async () => {
+        try {
+          const response = await fetch(`${deleteUserURL}/${userId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            showToast('Your account has been successfully deleted');
+
+            setTimeout(() => {
+              window.location.href = deleteRelocateURL || '/login';
+            }, 2000);
+          } else {
+            showToast('Failed to delete your account', 'error');
+            document.body.removeChild(modal);
+          }
+        } catch (error) {
+          console.error('Error deleting account:', error);
+          showToast('An error occurred while trying to delete your account', 'error');
+          document.body.removeChild(modal);
+        }
+      });
+    });
+
+    // Toast functions
+    window.showToast = function(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      const toastIcon = toast.querySelector('.toast-icon');
+
+      toastMessage.textContent = message;
+
+      if (type === 'error') {
+        toastIcon.style.background = 'var(--danger)';
+        toastIcon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+      } else {
+        toastIcon.style.background = 'var(--success)';
+        toastIcon.innerHTML = '<i class="fas fa-check"></i>';
+      }
+
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        hideToast();
+      }, 5000);
+    };
+
+    window.hideToast = function() {
+      const toast = document.getElementById('toast');
+      toast.classList.remove('show');
+    };
   });
 </script>
+
+<!-- Structured data for SEO -->
 <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -325,7 +969,3 @@
 </script>
 </body>
 </html>
-
-
-
-

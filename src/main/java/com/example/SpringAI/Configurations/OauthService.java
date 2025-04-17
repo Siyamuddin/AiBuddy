@@ -32,8 +32,6 @@ public class OauthService implements AuthenticationSuccessHandler {
     @Autowired
     private LocalUserRepo localUserRepo;
     @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
     private MailSenderServices mailSenderServices;
 
     @Override
