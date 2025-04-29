@@ -46,7 +46,7 @@ public class OauthService implements AuthenticationSuccessHandler {
         List<LocalUser> users = localUserRepo.findByEmailContainingIgnoreCase(email);
         if (users.size() == 0) {
             LocalUser localUser = new LocalUser();
-            localUser.setProvider("GOOGLE");
+            localUser.setProvider(user.getAuthorities().toString());
             localUser.setProviderId(user.getAttribute("sub").toString());
             localUser.setEmail(email);
             localUser.setFirstName(firstName);

@@ -8,8 +8,14 @@ import dev.langchain4j.data.document.splitter.DocumentByParagraphSplitter;
 import dev.langchain4j.data.document.splitter.DocumentByRegexSplitter;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.model.chat.request.ChatRequest;
+import dev.langchain4j.model.chat.request.ResponseFormat;
+import dev.langchain4j.model.chat.request.json.JsonObjectSchema;
+import dev.langchain4j.model.chat.request.json.JsonSchema;
+import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.embedding.onnx.bgesmallenv15q.BgeSmallEnV15QuantizedEmbeddingModel;
 import dev.langchain4j.model.input.Prompt;
@@ -20,6 +26,7 @@ import dev.langchain4j.store.embedding.EmbeddingSearchResult;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.patterns.TypePatternQuestions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import java.io.File;
@@ -30,6 +37,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+
+import static dev.langchain4j.model.chat.request.ResponseFormatType.JSON;
 import static java.util.stream.Collectors.joining;
 
 @Slf4j
@@ -91,11 +100,27 @@ public class RAGImpl {
         variables.put("information", information);
         Prompt Modelprompt = promptTemplate.apply(variables);
 
-        AiMessage aiMessage = configLangChain.chatClient().generate(Modelprompt.toUserMessage()).content();
+//        AiMessage aiMessage = configLangChain.chatClient().generate(Modelprompt.toUserMessage()).content();
+//        String response = aiMessage.text();
 
-
-        String response = aiMessage.text();
-
+        ResponseFormat responseFormat = ResponseFormat.builder()
+                .type(JSON) // type can be either TEXT (default) or JSON
+                .jsonSchema(JsonSchema.builder()
+                        .name("Short Question") // OpenAI requires specifying the name for the schema
+                        .rootElement(JsonObjectSchema.builder() // see [1] below
+                                .addStringProperty("Question")
+                                .addStringProperty("Answer")
+                                .required("Question","Answer") // see [2] below
+                                .build())
+                        .build())
+                .build();
+        UserMessage userMessage = UserMessage.from(Modelprompt.text());
+        ChatRequest chatRequest = ChatRequest.builder()
+                .responseFormat(responseFormat)
+                .messages(userMessage)
+                .build();
+        ChatResponse chatResponse = configLangChain.chatClient().chat(chatRequest);
+        String response = chatResponse.aiMessage().text();
         return response;
     }
 
