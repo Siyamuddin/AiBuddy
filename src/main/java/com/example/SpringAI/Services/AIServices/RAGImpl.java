@@ -95,36 +95,20 @@ public class RAGImpl {
                         + "Base your answer on the following content:\n"
                         + "{{information}}");
 
+
+        log.info("INFORMATION:" + information);
         Map<String, Object> variables = new HashMap<>();
         variables.put("question", prompt);
         variables.put("information", information);
         Prompt Modelprompt = promptTemplate.apply(variables);
 
-//        AiMessage aiMessage = configLangChain.chatClient().generate(Modelprompt.toUserMessage()).content();
-//        String response = aiMessage.text();
+        AiMessage aiMessage = configLangChain.chatClient().generate(Modelprompt.toUserMessage()).content();
 
-        ResponseFormat responseFormat = ResponseFormat.builder()
-                .type(JSON) // type can be either TEXT (default) or JSON
-                .jsonSchema(JsonSchema.builder()
-                        .name("Short Question") // OpenAI requires specifying the name for the schema
-                        .rootElement(JsonObjectSchema.builder() // see [1] below
-                                .addStringProperty("Question")
-                                .addStringProperty("Answer")
-                                .required("Question","Answer") // see [2] below
-                                .build())
-                        .build())
-                .build();
-        UserMessage userMessage = UserMessage.from(Modelprompt.text());
-        ChatRequest chatRequest = ChatRequest.builder()
-                .responseFormat(responseFormat)
-                .messages(userMessage)
-                .build();
-        ChatResponse chatResponse = configLangChain.chatClient().chat(chatRequest);
-        String response = chatResponse.aiMessage().text();
+
+        String response = aiMessage.text();
+
         return response;
     }
-
-
     public String generateRAGResponse2(String resource, String prompt) {
 
         Document document = new Document(resource);
