@@ -1,8 +1,6 @@
 package com.example.SpringAI.Services;
 
 import com.example.SpringAI.DTOs.UserDTO;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
