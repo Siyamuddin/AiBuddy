@@ -19,9 +19,5 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(apiResponse,HttpStatus.BAD_REQUEST);
 
     }
-    @ExceptionHandler(DatasetNotAvailable.class)
-    public ResponseEntity<APIResponse> datasetnotavailableException(DatasetNotAvailable dna){
-        APIResponse apiResponse=new APIResponse(dna.getMessage(), false);
-        return new ResponseEntity<>(apiResponse,HttpStatus.NOT_FOUND);
-    }
+
 }

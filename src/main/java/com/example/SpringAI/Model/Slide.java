@@ -22,9 +22,7 @@ public class Slide {
     private String generatedMCQ;
     @Column(columnDefinition = "TEXT")
     private String generatedQuestions;
-    @ManyToOne
-    @JoinColumn(name = "userclass")
-    private UserClass userclass;
+
 
     @ManyToOne
     @JoinColumn(name = "localUser")

@@ -41,14 +41,7 @@ public class LocalUser {
     private Date creationTime;
     @LastModifiedDate
     private Date lastUpdatedTime;
-
-    @OneToMany(mappedBy = "localUser",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
-    private List<UserClass> userClasses = new ArrayList<>();
-
     @OneToMany(mappedBy = "localUser",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
     private List<Slide> userSlides = new ArrayList<>();
-
-    @OneToMany(mappedBy = "localUser",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
-    private List<DataSet> dataSets = new ArrayList<>();
 
 }

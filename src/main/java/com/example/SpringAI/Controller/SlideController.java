@@ -26,45 +26,6 @@ public class SlideController {
     @Autowired
     private SlideServices slideServices;
 
-    @PostMapping(value = "/upload/{classId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Long> uploadSlide(@PathVariable Long classId,
-                                                   @RequestParam(value = "file", required = true) MultipartFile file) throws IOException {
-
-        
-        Long resp=slideServices.uploadSlide(classId, file);
-
-        return new ResponseEntity<>(resp, HttpStatus.OK);
-    }
-
-    @GetMapping("/get/all/slide/{classId}")
-    public ResponseEntity<List<SlideDTO>> getAllSlideByClass(@PathVariable Long classId,
-                                                             @RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
-                                                             @RequestParam(value = "pageSize", defaultValue = "5", required = false) int pageSize,
-                                                             @RequestParam(value = "sortBy", defaultValue = "id", required = false) String sortBy,
-                                                             @RequestParam(value = "sortDirection", defaultValue = "asc", required = false) String sortDirection
-    ) {
-        List<SlideDTO> response = slideServices.getAllSlidesByClass(classId, pageNumber, pageSize, sortBy, sortDirection);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-    @GetMapping("/get/all")
-    public ResponseEntity<List<SlideDTO>> getAllSlide(@RequestParam(value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
-                                                      @RequestParam(value = "pageSize", defaultValue = "5", required = false) int pageSize,
-                                                      @RequestParam(value = "sortBy", defaultValue = "id", required = false) String sortBy,
-                                                      @RequestParam(value = "sortDirection", defaultValue = "asc", required = false) String sortDirection)
-    {
-        List<SlideDTO> response=slideServices.getAllSlides(pageNumber,pageSize,sortBy,sortDirection);
-        return new ResponseEntity<>(response,HttpStatus.OK);
-    }
-
-
-
-
-
-
-
-
-
-
                                                  //Project
 
 

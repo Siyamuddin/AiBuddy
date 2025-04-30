@@ -27,7 +27,6 @@ public class FileService {
         if(!f.exists()){
             f.mkdir();
         }
-        rag.cleanAndStoreData(file.getInputStream());
         //copy file
         Files.copy(file.getInputStream(), Paths.get(filePath));
         return fileName1;

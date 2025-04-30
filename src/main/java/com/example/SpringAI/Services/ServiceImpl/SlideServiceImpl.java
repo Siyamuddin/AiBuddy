@@ -4,22 +4,15 @@ import com.example.SpringAI.DTOs.SlideDTO;
 import com.example.SpringAI.Exceptions.ResourceNotFoundException;
 import com.example.SpringAI.Model.LocalUser;
 import com.example.SpringAI.Model.Slide;
-import com.example.SpringAI.Model.UserClass;
 import com.example.SpringAI.Repository.LocalUserRepo;
 import com.example.SpringAI.Repository.SlideRepo;
-import com.example.SpringAI.Repository.UserClassRepo;
 import com.example.SpringAI.Services.AIServices.RAGImpl;
 import com.example.SpringAI.Services.SlideServices;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,8 +25,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SlideServiceImpl implements SlideServices {
     @Autowired
-    private UserClassRepo userClassRepo;
-    @Autowired
     private LocalUserRepo localUserRepo;
     @Autowired
     private SlideRepo slideRepo;
@@ -43,104 +34,13 @@ public class SlideServiceImpl implements SlideServices {
     private ModelMapper modelMapper;
     @Autowired
     private MailSenderServices mailSenderServices;
-    @Override
-    @Transactional
-    public Long uploadSlide(Long classId, MultipartFile file) throws IOException {
-        //checking if the userClass is available or not
-        UserClass userClass=userClassRepo.findById(classId).orElseThrow(()-> new ResourceNotFoundException("Class","class ID:",classId));
-
-// List to store text from each page
-        List<String> pagesText = new ArrayList<>();
-
-        try {
-            // Check if the document has pages
-            PDDocument document=PDDocument.load(file.getInputStream());
-            if (!document.isEncrypted()) {
-                PDFTextStripper stripper = new PDFTextStripper();
-                int totalPages = document.getNumberOfPages();
-
-                for (int i = 0; i < totalPages; i++) {
-                    stripper.setStartPage(i + 1);
-                    stripper.setEndPage(i + 1);
-                    String pageText = stripper.getText(document);
-                    pagesText.add(pageText);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String content = pagesText.stream()
-                .map(page -> page.replaceAll("\n", " ") + "\n\n\n")
-                .collect(Collectors.joining());
-
-        log.info("Content :"+content);
-        System.out.println(content);
-        //Creating a slide object.
-        Slide slide=new Slide();
-        slide.setSlideContent(content);
-        //Setting up the slide fields.
-        slide.setSlideTitle(file.getOriginalFilename());
-        //Setting slides userClass
-        slide.setUserclass(userClass);
-        //saving the slide.
-        Slide resp=slideRepo.save(slide);
-        //Mail confirmation that slide is ready for operation.
-        mailSenderServices.sendEmail(userClass.getLocalUser().getEmail(),"AiBuddy mail Confirmation.","Your uploaded slide is ready to perform operations.");
-        return resp.getId();
-    }
-    @Override
-    public List getAllSlidesByClass(Long classId, int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        UserClass userClass=userClassRepo.findById(classId).orElseThrow(()->new ResourceNotFoundException("Class","class ID",classId));
-
-        Sort sort;
-        if(sortDirection.equalsIgnoreCase("asc"))
-        {
-            sort=Sort.by(sortBy).ascending();
-        }
-        else {
-            sort=Sort.by(sortBy).descending();
-        }
-        Pageable pageable= PageRequest.of(pageNumber,pageSize,sort);
-        Page<Slide> slides=slideRepo.findAllByUserclass(userClass,pageable);
-        List<SlideDTO> slideDTOS=slides.stream().map((slide)-> modelMapper.map(slide,SlideDTO.class)).collect(Collectors.toUnmodifiableList());
-        return slideDTOS;
-    }
-    @Override
-    public List<SlideDTO> getAllSlides(int pageNumber, int pageSize, String sortBy, String sortDirection) {
-        Sort sort;
-        if(sortDirection.equalsIgnoreCase("asc"))
-        {
-            sort=Sort.by(sortBy).ascending();
-        }
-        else {
-            sort=Sort.by(sortBy).descending();
-        }
-        Pageable pageable=PageRequest.of(pageNumber,pageSize,sort);
-        Page<Slide> pages=slideRepo.findAll(pageable);
-        List<SlideDTO> slideDTOS=pages.stream().map(page-> modelMapper.map(page,SlideDTO.class)).collect(Collectors.toUnmodifiableList());
-        return slideDTOS;
-    }
-
-
-
-
-
-
-
-
-
-
 
     //Project
-
-
     @Override
     public SlideDTO userSlideUpload(Long userId, MultipartFile file) {
-        //checking if the userClass is available or not
+        //checking if the user is available or not
         LocalUser localUser=localUserRepo.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","ID",userId));
         List<String> pagesText = new ArrayList<>();
-
         try {
             // Check if the document has pages
             PDDocument document=PDDocument.load(file.getInputStream());
@@ -169,7 +69,7 @@ public class SlideServiceImpl implements SlideServices {
         //Setting up the slide fields.
         slide.setSlideContent(content);
         slide.setSlideTitle(file.getOriginalFilename());
-        //Setting slides userClass
+        //Setting slides User
         slide.setLocalUser(localUser);
         //saving the slide.
         Slide resp=slideRepo.save(slide);
@@ -209,7 +109,7 @@ public class SlideServiceImpl implements SlideServices {
     @Override
     public String generateShortQuestions(Long slideId, String numberOfQuestions) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
-        String questions = rag.generateRAGResponse(slide.getSlideContent(),"Generate "+ numberOfQuestions+ " pieces of possible short questions and it's answers from this given lecture");
+        String questions = rag.generateRAGResponse2(slide.getSlideContent(),"Generate "+ numberOfQuestions+ " pieces of possible short questions and it's answers from this given lecture");
         log.info("\n Prompt:   "+slide.getSlideContent(),"Generate "+ numberOfQuestions+ " pieces of possible short questions and it's answers from this given lecture");
         slide.setGeneratedQuestions(questions);
         slideRepo.save(slide);

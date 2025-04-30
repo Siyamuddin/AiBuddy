@@ -16,11 +16,7 @@ public interface SlideServices {
     String generateMCQ(Long slideId,String numberOfMCQs);
     String generateSummary(Long slideId);
     String writeAiQuery(Long slideId, String query);
-
-    Long uploadSlide(Long classId, MultipartFile file) throws IOException;
     SlideDTO updateSlide(Long slideId, SlideDTO slideDTO);
-    List getAllSlidesByClass(Long classId,int pageNumber,int pageSize,String sortBy,String sortDirection);
-    List<SlideDTO> getAllSlides(int pageNumber, int pageSize, String sortBy, String sortDirection);
 
 
 }
