@@ -1,6 +1,6 @@
 
 
-# AI-Powered Student Study Aid with RAG (Retrieval-Augmented Generation)
+# AI-Powered Student Study Aid application with RAG (Retrieval-Augmented Generation) implementation
 
 This project provides a Java-based backend application leveraging Retrieval-Augmented Generation (RAG) to transform the way students engage with lecture materials. Using advanced AI models, the application assists students in understanding topics and preparing for exams by generating exam-ready content from lecture slides.
 
@@ -10,9 +10,9 @@ The system enables students to upload lecture slides in PDF format, query inform
 
 ## 🛠️ Technologies Used
 
-- **Programming Language**: Java
-- **Framework**: Spring Boot
-- **Database**: MySQL and small vector DB
+- **Programming Language**: Java 17
+- **Framework**: Spring Boot, Spring Data JPA, Thymeleaf
+- **Database**: MySQL and Inmemory vector DB
 - **Security**: Oauth2 for secure login and logout functionality
 - **AI Model**: Ollama (Llama-3.2 & mixbreed for embeddings) open-source model
 - **Libraries**:
@@ -20,34 +20,6 @@ The system enables students to upload lecture slides in PDF format, query inform
   - Langchain4j (Java library for RAG operations)
 - **User Interface**: Thymeleaf and Swagger UI for API documentation and exploration
 
-## 🌟 Features
-
-### 1. Class Management
-- **Create Classes**: Students can create and manage classes within the application.
-- **Upload Materials**: Lecture slides can be uploaded in PDF format for AI-driven analysis.
-
-### 2. AI-Powered Study Assistance
-- **Text Extraction & Segmentation**: Uploaded PDFs are converted to text and segmented into manageable sections.
-- **Vector Embeddings**: Text segments are transformed into vector embeddings using Langchain4j, stored in an in-memory embedding store for efficient retrieval.
-- **Retrieval-Augmented Generation (RAG)**: Upon a student's query, the system retrieves the most relevant lecture sections and provides AI-generated responses, helping students understand complex topics.
-
-### 3. Exam Preparation Assistance
-- **Automatic Summarization**: Summarizes uploaded lecture content automatically.
-- **MCQ and Short Answer Generation**: Generates potential MCQs and short-answer questions from slide content to aid in exam preparation.
-
-### 4. User Authentication
-- **JWT-Based Security**: Secure login and logout features with JWT tokens to manage user sessions and prevent unauthorized access.
-
-### 5. API Documentation with Swagger UI
-- **Interactive Documentation**: Swagger UI enables developers and users to explore API endpoints, execute requests, and view real-time responses within a user-friendly interface.
-
-## 🛠️ Implementation Details
-
-- **Spring Boot**: Facilitates REST API development, handling core logic, routing, authentication, and backend services.
-- **Langchain4j for RAG**: Manages text segmentation into embeddings, retrieves relevant segments, and integrates responses using the Llama-3.2 AI model.
-- **MySQL**: Stores user data, class info, lecture materials, and AI-generated content.
-- **JWT**: Secures API access by managing user authentication and authorization.
-- **Swagger UI**: Provides an interactive interface to test and understand the API endpoints.
 
 ## 🚀 Getting Started
 
@@ -65,8 +37,8 @@ The system enables students to upload lecture slides in PDF format, query inform
    ```
 
 2. **Set Up MySQL Database**:
-   - Create a new MySQL database.
-   - Update database configurations in `application.properties`.
+    - Create a new MySQL database.
+    - Update database configurations in `application.properties`.
 
 3. **Build the Application**:
    ```bash
@@ -78,14 +50,79 @@ The system enables students to upload lecture slides in PDF format, query inform
    mvn spring-boot:run
    ```
 
-5. **Access Swagger UI**:
-   Navigate to `http://localhost:8080/swagger-ui.html` to explore the API endpoints.
-6. **Pull the Image from dockerHub**:
+5. **Access UI**:
+   Navigate to `http://localhost:8080` to explore the features.
+
+## Docker Environment setup:
+**Pull the Image from dockerHub**:
    ```bash
    docker pull uddin17/ai_buddy:latest
    docker pull mysql:latest
    ```
+   ```bash
+   --AI Model Setup--
+   AI_API_KEY=Use your Ai model Api Key
+   AI_BASE_URL=Ai models base url
+   AI_MODEL_NAME=Name of your AI model
    
+   --Mail Service Setup--
+   MAIL_HOST=smtp.gmail.com;
+   MAIL_PASSWORD=User your generated password
+   MAIL_PORT=User your port
+   MAIL_USERNAME=Use your email address
+   
+   --Auth Service Setup--
+   OAUTH2.ID=Use your OAUTH ID
+   OAUTH2.SECRETE=Use your OAuth secrete
+   OAUTH_REDIRECT_URI=User your rdirect URL
+   
+   --Database Setup--
+   SPRING_DATASOURCE_PASSWORD=Password;
+   SPRING_DATASOURCE_URL=User your DB url
+   SPRING_DATASOURCE_USERNAME=Username
+   SPRING_JPA_HIBERNATE_DDL_AUTO=update;
+   
+   --API Call Setup for Frontend(Thymeleaf)--
+   UPDATE=http://localhost:8080/api/v1/user/update;
+   UPLOAD_SLIDE=http://localhost:8080/api/v1/slide/upload/user
+   DELETE=http://localhost:8080/api/v1/user/delete;
+   DELETE_REDIRECT=http://localhost:8080/login;
+   DELETE_SLIDE=http://localhost:8080/api/v1/slide/delete;
+   GET_ALL=http://localhost:8080/api/v1/slide/get/all/user;
+   GMCQ=http://localhost:8080/api/v1/slide/generate/mcq;
+   GS=http://localhost:8080/api/v1/slide/generate/summary;
+   GSQ=http://localhost:8080/api/v1/slide/generate/sq;
+   ```
+
+## 🌟 Features
+
+### 1. Class Management
+- **Create Classes**: Students can create and manage classes within the application.
+- **Upload Materials**: Lecture slides can be uploaded in PDF format for AI-driven analysis.
+
+### 2. AI-Powered Study Assistance
+- **Text Extraction & Segmentation**: Uploaded PDFs are converted to text and segmented into manageable sections.
+- **Vector Embeddings**: Text segments are transformed into vector embeddings using Langchain4j, stored in an in-memory embedding store for efficient retrieval.
+- **Retrieval-Augmented Generation (RAG)**: Upon a student's query, the system retrieves the most relevant lecture sections and provides AI-generated responses, helping students understand complex topics.
+
+### 3. Exam Preparation Assistance
+- **Automatic Summarization**: Summarizes uploaded lecture content automatically.
+- **MCQ and Short Answer Generation**: Generates potential MCQs and short-answer questions from slide content to aid in exam preparation.
+
+### 4. User Authentication
+- **Oauth2-Based Security**: Secure login and logout features with Google Oauth2 to manage user sessions and prevent unauthorized access.
+
+### 5. API Documentation with Swagger UI
+- **Interactive Documentation**: Swagger UI enables developers and users to explore API endpoints, execute requests, and view real-time responses within a user-friendly interface.
+
+## 🛠️ Implementation Details
+
+- **Spring Boot**: Facilitates REST API development, handling core logic, routing, authentication, and backend services.
+- **Langchain4j for RAG**: Manages text segmentation into embeddings, retrieves relevant segments, and integrates responses using the Llama-3.2 AI model.
+- **MySQL**: Stores user data, class info, lecture materials, and AI-generated content.
+- **Oauth2**: Secures API access by managing user authentication and authorization.
+- **Swagger UI**: Provides an interactive interface to test and understand the API endpoints.
+
 
 ## 🤝 Contributions
 
