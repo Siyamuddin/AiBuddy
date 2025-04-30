@@ -30,7 +30,7 @@ jobs:
       - name: Build with Maven
         run: mvn clean install
       - name: Build & push Docker image
-      - uses: mr-smithers-excellent/docker-build-push@v6
+        uses: mr-smithers-excellent/docker-build-push@v6
         with:
           image: uddin17/ai_buddy
           tags: latest
