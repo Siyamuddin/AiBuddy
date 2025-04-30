@@ -7,6 +7,8 @@ src/main/resources/Secretes.env
 src/main/resources/templates/listUser.html
 src/main/resources/templates/userClass.html
 src/main/resources/templates/register.html
+.github
+*.log
 ### STS ###
 .apt_generated
 .classpath
