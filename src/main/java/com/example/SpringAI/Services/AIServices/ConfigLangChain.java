@@ -22,7 +22,7 @@ public class ConfigLangChain {
     private String Base_URL;
     @Value("${ai.api.key}")
     private String API_KEY;
-
+//configured ami model
     @Bean
     public ChatLanguageModel chatClient(){
         return  OpenAiChatModel.builder()
@@ -35,8 +35,7 @@ public class ConfigLangChain {
 
     }
 
-
-
+    // splitting AI generated sample questions
     public static List<String> splitQuestions(String text) {
         List<String> questions = new ArrayList<>();
 
@@ -51,7 +50,7 @@ public class ConfigLangChain {
     }
 
 
-
+//Generate 5 questions based on the user questions.
     public List<String> simplifyQuestions(String userQuerry){
         String prompt="You are an AI language model assistant." +
                 " Your task is to generate five different versions of the given user question to retrieve relevant documents from a vector database." +

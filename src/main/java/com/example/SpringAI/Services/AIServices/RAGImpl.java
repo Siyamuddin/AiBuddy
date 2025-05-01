@@ -1,6 +1,11 @@
 package com.example.SpringAI.Services.AIServices;
+import com.example.SpringAI.Utility.GenerateQuestions;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
+import dev.langchain4j.data.document.splitter.DocumentByParagraphSplitter;
 import dev.langchain4j.data.document.splitter.DocumentByRegexSplitter;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.message.AiMessage;
@@ -34,9 +39,12 @@ public class RAGImpl {
 
     public String generateRAGResponse(String resource, String prompt) {
         Document document = new Document(resource);
-        // Split document into segments 100 tokens each
-        DocumentSplitter splitter = new DocumentByRegexSplitter("\n", "\n", 1000, 0);
+        log.info("Raw tex: "+document.toString());
+        // Split document into segments 1000 tokens each
+        DocumentSplitter splitter = new DocumentByParagraphSplitter(500,3);
         List<TextSegment> segments = splitter.split(document);
+        log.info("Segment Size: "+segments.size());
+        log.info("Segmented : "+segments.toString());
 
         // Embed segments (convert them into vectors that represent the meaning) using embedding model
         EmbeddingModel embeddingModel = new BgeSmallEnV15QuantizedEmbeddingModel();
@@ -81,21 +89,27 @@ public class RAGImpl {
 
 
         log.info("INFORMATION:" + information);
+        log.info("Size of the information: "+information.length());
         Map<String, Object> variables = new HashMap<>();
         variables.put("question", prompt);
         variables.put("information", information);
         Prompt Modelprompt = promptTemplate.apply(variables);
+
+
+        log.info("Final prompt: "+Modelprompt.text());
+        log.info("Size of final prompt: "+Modelprompt.toString().length());
+
+
+
 
         AiMessage aiMessage = configLangChain.chatClient().generate(Modelprompt.toUserMessage()).content();
 
 
         String response = aiMessage.text();
 
-        return response;
+    return response;
+
     }
-
-
-
 
 
 
@@ -106,7 +120,7 @@ public class RAGImpl {
 
         Document document = new Document(resource);
         // Split document into segments
-        DocumentSplitter splitter = new DocumentByRegexSplitter("\n\n\n", " ", 2000, 05);
+        DocumentSplitter splitter = new DocumentByRegexSplitter("\n\n\n", " ", 5000, 05);
         List<TextSegment> segments = splitter.split(document);
         List<String> text = segments.stream()
                 .map(TextSegment::text)  // Extract the text from each TextSegment
@@ -134,11 +148,6 @@ public class RAGImpl {
 
         return aiMessage2.text();
     }
-
-
-
-
-
 
 
     public String pageSummarization(List<String> text) {

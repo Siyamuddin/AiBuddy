@@ -8,6 +8,7 @@ import com.example.SpringAI.Repository.LocalUserRepo;
 import com.example.SpringAI.Repository.SlideRepo;
 import com.example.SpringAI.Services.AIServices.RAGImpl;
 import com.example.SpringAI.Services.SlideServices;
+import com.example.SpringAI.Utility.GenerateQuestions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -109,9 +110,10 @@ public class SlideServiceImpl implements SlideServices {
     @Override
     public String generateShortQuestions(Long slideId, String numberOfQuestions) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
-        String questions = rag.generateRAGResponse2(slide.getSlideContent(),"Generate "+ numberOfQuestions+ " pieces of possible short questions and it's answers from this given lecture");
-        log.info("\n Prompt:   "+slide.getSlideContent(),"Generate "+ numberOfQuestions+ " pieces of possible short questions and it's answers from this given lecture");
-        slide.setGeneratedQuestions(questions);
+        String questions = rag.generateRAGResponse(slide.getSlideContent(),"Generate "+ numberOfQuestions+ " pieces of possible short questions and it's answers from this given lecture");
+        log.info("\n Prompt:   "+slide.getSlideContent(),"Generate "+ numberOfQuestions+ " pieces of possible short questions and it's answers from this given lecture. The respones format should be like: Question: ;\n Answer: ;");
+
+        slide.setGeneratedQuestions(questions.toString());
         slideRepo.save(slide);
 
         String recipientEmail = slide.getLocalUser().getEmail();
@@ -120,13 +122,14 @@ public class SlideServiceImpl implements SlideServices {
         String message = String.format(
                 "Hello %s,\n\nYour AI-generated short Questions are ready! 🎉\n\nFrom Slide: %s\n\nThank you for using AI Buddy to enhance your productivity.\n\nBest regards,\nThe AI Buddy Team",
                 slide.getLocalUser().getFirstName(), slideTitle);
-        mailSenderServices.sendEmail(recipientEmail, subject, message);        return questions;
+        mailSenderServices.sendEmail(recipientEmail, subject, message);
+        return questions;
     }
 
     @Override
     public String generateMCQ(Long slideId, String numberOfMCQs) {
         Slide slide=slideRepo.findById(slideId).orElseThrow(()-> new ResourceNotFoundException("Slide","slide ID: ",slideId));
-        String MCQ=rag.generateRAGResponse2(slide.getSlideContent(),"Generate "+numberOfMCQs+" multiple-choice questions (MCQs) based on the content. Ensure that each question has 4 options, and highlight the correct answer.");
+        String MCQ=rag.generateRAGResponse(slide.getSlideContent(),"Generate "+numberOfMCQs+" multiple-choice questions (MCQs) based on the content. Ensure that each question has 4 options, and highlight the correct answer.");
         slide.setGeneratedMCQ(MCQ);
         slideRepo.save(slide);
 
@@ -150,7 +153,7 @@ public class SlideServiceImpl implements SlideServices {
                   The goal is to make the content easier to review and prepare for the exam.
                 """;
 
-        String summary = rag.generateRAGResponse2(slide.getSlideContent(),prompt);
+        String summary = rag.generateRAGResponse(slide.getSlideContent(),prompt);
         slide.setSlideSummary(summary);
         slideRepo.save(slide);
 
